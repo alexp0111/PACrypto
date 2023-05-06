@@ -12,8 +12,7 @@
     <color name="green_300">#AED581</color>
     <color name="orange_300">#FF8A65</color>
 
-
-    <color name="main_text_color">@color/black</color>
+    <color name="main_text_color">@color/white</color>
     <color name="acc_text_color">@color/gray_400</color>
-    <color name="background_main">@color/white</color>
+    <color name="background_main">@color/gray_900</color>
 </resources>
