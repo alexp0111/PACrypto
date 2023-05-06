@@ -15,4 +15,6 @@
     <color name="main_text_color">@color/white</color>
     <color name="acc_text_color">@color/gray_400</color>
     <color name="background_main">@color/gray_900</color>
+    <color name="background_card">@color/gray_900</color>
+    <color name="background_card_hat">@color/gray_700</color>
 </resources>

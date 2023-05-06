@@ -16,4 +16,6 @@
     <color name="main_text_color">@color/black</color>
     <color name="acc_text_color">@color/gray_400</color>
     <color name="background_main">@color/white</color>
+    <color name="background_card">@color/white</color>
+    <color name="background_card_hat">@color/gray_400</color>
 </resources>

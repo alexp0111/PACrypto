@@ -21,4 +21,12 @@
         android:layout_height="wrap_content"
         android:text="Найти" />
 
+    <fragment
+        android:id="@+id/test_card"
+        android:name="com.example.pacrypto.CardTest"
+        android:tag="test"
+        tools:layout="@layout/item_coin_type_1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
 </LinearLayout>
