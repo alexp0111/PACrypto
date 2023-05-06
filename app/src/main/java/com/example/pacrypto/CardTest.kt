@@ -7,15 +7,16 @@ import android.view.View
 import android.view.ViewGroup
 import com.example.pacrypto.databinding.FragmentHomeBinding
 import com.example.pacrypto.databinding.ItemCoinType1Binding
+import com.example.pacrypto.databinding.ItemCoinType2Binding
 
-class CardTest : Fragment(R.layout.item_coin_type_1) {
+class CardTest : Fragment(R.layout.item_coin_type_2) {
 
 
-    private var binding: ItemCoinType1Binding? = null
+    private var binding: ItemCoinType2Binding? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding = ItemCoinType1Binding.bind(view)
+        binding = ItemCoinType2Binding.bind(view)
     }
 
     override fun onDestroy() {
