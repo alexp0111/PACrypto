@@ -15,10 +15,16 @@
         <item name="android:textColor">@color/main_text_color</item>
         <item name="android:fontFamily">@font/inter_regular</item>
 
-    </style><style name="CardViewType1" parent="Widget.MaterialComponents.CardView">
+    </style>
+
+    <style name="CardViewType1" parent="Widget.MaterialComponents.CardView">
         <item name="cardCornerRadius">@dimen/card_corner_radius</item>
         <item name="cardElevation">@dimen/card_elevation</item>
         <item name="background">@color/background_main</item>
+    </style>
+
+    <style name="EditTextSearch" parent="Widget.AppCompat.EditText">
+        <item name="background">@drawable/search_background</item>
     </style>
 
 

@@ -22,4 +22,9 @@
         <item name="android:textColor">@color/acc_text_color</item>
         <item name="android:fontFamily">@font/inter_regular</item>
     </style>
+
+    <style name="EditTextSearch" parent="ThemeOverlay.Material3.TextInputEditText">
+
+
+    </style>
 </resources>

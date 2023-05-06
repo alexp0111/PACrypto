@@ -8,4 +8,5 @@
     <dimen name="card_elevation">6dp</dimen>
     <dimen name="card_hat">100dp</dimen>
     <dimen name="card_height_type_2">100dp</dimen>
+    <dimen name="half_basic_margin">8dp</dimen>
 </resources>
