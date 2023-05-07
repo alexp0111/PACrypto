@@ -17,11 +17,28 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
+            android:visibility="visible"
             android:id="@+id/iv_qr"
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:layout_margin="@dimen/basic_margin"
             android:src="@drawable/ic_qr"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/ll_search"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tv_name"
+            style="@style/TextMid"
+            android:gravity="center"
+            android:visibility="gone"
+            android:textColor="@color/picker_text_on"
+            android:textSize="13sp"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_margin="@dimen/basic_margin"
+            android:text="NA\nME"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/ll_search"
             app:layout_constraintStart_toStartOf="parent"
@@ -66,10 +83,27 @@
 
         </LinearLayout>
 
+        <TextView
+            android:id="@+id/tv_ticker"
+            style="@style/TextMid"
+            android:visibility="gone"
+            android:gravity="center"
+            android:textColor="@color/picker_text_off"
+            android:textSize="13sp"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_margin="@dimen/basic_margin"
+            android:text="TIC\nKER"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/ll_search"
+            app:layout_constraintTop_toTopOf="parent" />
+
         <ImageView
             android:id="@+id/iv_sub"
             android:layout_width="32dp"
             android:layout_height="32dp"
+            android:visibility="visible"
             android:layout_margin="@dimen/basic_margin"
             android:src="@drawable/ic_ring"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -106,7 +140,7 @@
             android:layout_height="42dp"
             android:layout_margin="@dimen/half_basic_margin"
             android:background="@drawable/picker_background"
-            android:elevation="@dimen/card_elevation"
+            android:elevation="@dimen/cl_elevation"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
@@ -119,7 +153,7 @@
             android:layout_height="42dp"
             android:layout_marginVertical="@dimen/half_basic_margin"
             android:layout_marginStart="@dimen/half_basic_margin"
-            android:elevation="@dimen/card_elevation"
+            android:elevation="@dimen/cl_elevation"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/picker_2"
             app:layout_constraintStart_toStartOf="parent"

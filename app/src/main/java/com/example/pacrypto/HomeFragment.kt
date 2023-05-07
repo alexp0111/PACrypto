@@ -19,7 +19,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
         binding.ivSub.setOnClickListener {
             parentFragmentManager.beginTransaction()
-                .replace(R.id.container_main, SubscriptionsFragment())
+                .replace(R.id.container_main, InfoFragment())
                 .addToBackStack(null).commit()
         }
     }

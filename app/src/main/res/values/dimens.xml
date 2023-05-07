@@ -11,4 +11,5 @@
     <dimen name="half_basic_margin">8dp</dimen>
     <dimen name="half_card_corner_radius">8dp</dimen>
     <dimen name="round">1000dp</dimen>
+    <dimen name="cl_elevation">4dp</dimen>
 </resources>
