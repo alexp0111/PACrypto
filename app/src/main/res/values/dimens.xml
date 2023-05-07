@@ -9,4 +9,6 @@
     <dimen name="card_hat">100dp</dimen>
     <dimen name="card_height_type_2">100dp</dimen>
     <dimen name="half_basic_margin">8dp</dimen>
+    <dimen name="half_card_corner_radius">8dp</dimen>
+    <dimen name="round">1000dp</dimen>
 </resources>

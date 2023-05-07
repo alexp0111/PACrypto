@@ -3,6 +3,7 @@
     <style name="Theme.PACrypto" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="android:statusBarColor">@color/gray_900</item>
         <item name="android:windowLightStatusBar">false</item>
+        <item name="colorControlActivated">@color/main_text_color</item>
     </style>
 
     <style name="TextHeader" parent="Widget.AppCompat.TextView">
@@ -23,8 +24,14 @@
         <item name="android:fontFamily">@font/inter_regular</item>
     </style>
 
-    <style name="EditTextSearch" parent="ThemeOverlay.Material3.TextInputEditText">
-
-
+    <style name="CardViewType1" parent="Widget.MaterialComponents.CardView">
+        <item name="cardCornerRadius">@dimen/card_corner_radius</item>
+        <item name="cardElevation">@dimen/card_elevation</item>
+        <item name="cardBackgroundColor">@color/background_card</item>
     </style>
+
+    <style name="EditTextSearch" parent="Widget.AppCompat.EditText">
+        <item name="background">@drawable/search_background</item>
+    </style>
+
 </resources>

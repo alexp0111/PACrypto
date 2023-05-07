@@ -4,5 +4,5 @@
     <corners
         android:radius="@dimen/round"/>
 
-    <solid android:color="@color/background_search" />
+    <solid android:color="@color/background_week_item" />
 </shape>

@@ -18,4 +18,10 @@
     <color name="background_main">@color/white</color>
     <color name="background_card">@color/white</color>
     <color name="background_card_hat">@color/gray_400</color>
+    <color name="background_search">@color/gray_200</color>
+    <color name="background_time">@color/gray_200</color>
+    <color name="background_week_item">@color/gray_200</color>
+    <color name="color_on">@color/black</color>
+    <color name="color_off">@color/white</color>
+    <color name="divider">@color/gray_200</color>
 </resources>

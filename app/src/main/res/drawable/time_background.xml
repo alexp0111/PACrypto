@@ -2,7 +2,7 @@
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
 
     <corners
-        android:radius="@dimen/round"/>
+        android:radius="@dimen/half_card_corner_radius"/>
 
-    <solid android:color="@color/background_search" />
+    <solid android:color="@color/background_time" />
 </shape>

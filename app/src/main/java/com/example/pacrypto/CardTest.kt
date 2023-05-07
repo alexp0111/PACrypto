@@ -8,15 +8,16 @@ import android.view.ViewGroup
 import com.example.pacrypto.databinding.FragmentHomeBinding
 import com.example.pacrypto.databinding.ItemCoinType1Binding
 import com.example.pacrypto.databinding.ItemCoinType2Binding
+import com.example.pacrypto.databinding.ItemSubscriptionBinding
 
-class CardTest : Fragment(R.layout.item_coin_type_2) {
+class CardTest : Fragment(R.layout.item_subscription) {
 
 
-    private var binding: ItemCoinType2Binding? = null
+    private var binding: ItemSubscriptionBinding? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding = ItemCoinType2Binding.bind(view)
+        binding = ItemSubscriptionBinding.bind(view)
     }
 
     override fun onDestroy() {
