@@ -23,5 +23,8 @@
     <color name="background_week_item">@color/gray_200</color>
     <color name="color_on">@color/black</color>
     <color name="color_off">@color/white</color>
+    <color name="picker_text_on">@color/black</color>
+    <color name="picker_text_off">@color/gray_200</color>
     <color name="divider">@color/gray_200</color>
+    <color name="picker">@color/white</color>
 </resources>

@@ -9,15 +9,23 @@ private const val TAG = "HOME_FRAGMENT"
 
 class HomeFragment : Fragment(R.layout.fragment_home) {
 
-    private var binding: FragmentHomeBinding? = null
+    private var fragmentHomeBinding: FragmentHomeBinding? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding = FragmentHomeBinding.bind(view)
+        val binding = FragmentHomeBinding.bind(view)
+        fragmentHomeBinding = binding
+
+
+        binding.ivSub.setOnClickListener {
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.container_main, SubscriptionsFragment())
+                .addToBackStack(null).commit()
+        }
     }
 
     override fun onDestroy() {
-        binding = null
+        fragmentHomeBinding = null
         super.onDestroy()
     }
 }

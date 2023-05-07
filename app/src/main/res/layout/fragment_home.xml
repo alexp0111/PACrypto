@@ -17,7 +17,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
-            android:id="@+id/imageButton3"
+            android:id="@+id/iv_qr"
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:layout_margin="@dimen/basic_margin"
@@ -31,12 +31,12 @@
             android:id="@+id/ll_search"
             android:layout_width="0dp"
             android:layout_height="36dp"
-            android:gravity="center_vertical"
             android:background="@drawable/search_background"
+            android:gravity="center_vertical"
             android:orientation="horizontal"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/imageButton2"
-            app:layout_constraintStart_toEndOf="@+id/imageButton3"
+            app:layout_constraintEnd_toStartOf="@+id/iv_sub"
+            app:layout_constraintStart_toEndOf="@+id/iv_qr"
             app:layout_constraintTop_toTopOf="parent">
 
             <ImageView
@@ -47,7 +47,6 @@
                 android:src="@drawable/ic_search" />
 
             <EditText
-                android:textCursorDrawable="@drawable/color_cursor_2"
                 android:id="@+id/et_search"
                 style="@style/TextAcc"
                 android:layout_width="match_parent"
@@ -62,12 +61,13 @@
                 android:maxLines="1"
                 android:scrollHorizontally="true"
                 android:textColor="@color/gray_900"
-                android:textColorHint="@color/gray_400" />
+                android:textColorHint="@color/gray_400"
+                android:textCursorDrawable="@drawable/color_cursor_2" />
 
         </LinearLayout>
 
         <ImageView
-            android:id="@+id/imageButton2"
+            android:id="@+id/iv_sub"
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:layout_margin="@dimen/basic_margin"
@@ -83,24 +83,98 @@
     <TextView
         android:id="@+id/tv_header"
         style="@style/TextHeader"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/basic_margin"
         android:gravity="start|center_vertical"
         android:text="Закладки"
-        app:layout_constraintBottom_toTopOf="@id/test_card"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/rv"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/cl_header" />
 
-    <fragment
-        android:id="@+id/test_card"
-        android:name="com.example.pacrypto.CardTest"
-        android:layout_width="match_parent"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/cl_picker"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:tag="test"
+        app:layout_constraintBottom_toTopOf="@+id/rv"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/cl_header">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/picker_circle"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:layout_margin="@dimen/half_basic_margin"
+            android:background="@drawable/picker_background"
+            android:elevation="@dimen/card_elevation"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/picker_1"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:layout_marginVertical="@dimen/half_basic_margin"
+            android:layout_marginStart="@dimen/half_basic_margin"
+            android:elevation="@dimen/card_elevation"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/picker_2"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/picker_text_1"
+                style="@style/TextHeader"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="$"
+                android:textColor="@color/picker_text_on"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/picker_2"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:layout_marginVertical="@dimen/half_basic_margin"
+            android:layout_marginEnd="@dimen/basic_margin"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/picker_1"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/picker_text_2"
+                style="@style/TextHeader"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="₽"
+                android:textColor="@color/picker_text_off"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_header"
-        tools:layout="@layout/item_subscription" />
+        app:layout_constraintTop_toBottomOf="@id/cl_picker" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
