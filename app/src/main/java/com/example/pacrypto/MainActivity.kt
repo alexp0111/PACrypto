@@ -3,6 +3,7 @@ package com.example.pacrypto
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.example.pacrypto.databinding.ActivityMainBinding
+import com.example.pacrypto.ui.HomeFragment
 
 class MainActivity : AppCompatActivity() {
 

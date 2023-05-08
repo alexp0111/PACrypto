@@ -1,4 +1,4 @@
-package com.example.pacrypto
+package com.example.pacrypto.animator
 
 import android.animation.ObjectAnimator
 import android.content.Context
@@ -7,6 +7,7 @@ import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.animation.doOnEnd
 import androidx.core.animation.doOnStart
+import com.example.pacrypto.R
 
 class PickerAnimator(private val index: (String) -> Unit) {
 

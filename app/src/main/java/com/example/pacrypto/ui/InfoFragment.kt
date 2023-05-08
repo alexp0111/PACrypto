@@ -1,4 +1,4 @@
-package com.example.pacrypto
+package com.example.pacrypto.ui
 
 import android.graphics.Color
 import android.os.Bundle
@@ -7,7 +7,8 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
-import com.db.williamchart.Tooltip
+import com.example.pacrypto.animator.PickerAnimator
+import com.example.pacrypto.R
 import com.example.pacrypto.databinding.FragmentInfoBinding
 
 private const val TAG = "INFO_FRAGMENT"
@@ -43,7 +44,7 @@ class InfoFragment : Fragment(R.layout.fragment_info) {
         }
 
         PickerAnimator {
-            Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
+            binding.lineChart.animate(lineSet)
         }.animate(resources, context, datePicker, binding.pickerCircle)
 
         binding.apply {
