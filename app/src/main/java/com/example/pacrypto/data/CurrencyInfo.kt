@@ -5,7 +5,8 @@ data class CurrencyInfo(
     val ticker: String,
     val startDate: String,
     val endDate: String,
-    val data: List<List<CurrencyInfoCell>>, // 6 periods, each of which have amount of infoCells
+    val priceUsd: Double,
+    val data: List<List<CurrencyInfoCell>>?, // 6 periods, each of which have amount of infoCells
 ) {
     override fun toString(): String {
         return "CurrencyInfo(name='$name', ticker='$ticker', startDate='$startDate', endDate='$endDate', data=$data)"
