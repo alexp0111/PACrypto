@@ -3,6 +3,9 @@ package com.example.pacrypto
 import android.graphics.Color
 import android.os.Bundle
 import android.view.View
+import android.widget.TextView
+import android.widget.Toast
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import com.db.williamchart.Tooltip
 import com.example.pacrypto.databinding.FragmentInfoBinding
@@ -13,11 +16,35 @@ class InfoFragment : Fragment(R.layout.fragment_info) {
 
 
     private var fragmentInfoBinding: FragmentInfoBinding? = null
+    private var currencyPicker = mutableMapOf<ConstraintLayout, TextView>()
+    private var datePicker = mutableMapOf<ConstraintLayout, TextView>()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val binding = FragmentInfoBinding.bind(view)
         fragmentInfoBinding = binding
+
+        binding.apply {
+            currencyPicker[currencyPicker1] = currencyPickerText1
+            currencyPicker[currencyPicker2] = currencyPickerText2
+        }
+
+        PickerAnimator {
+            Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
+        }.animate(resources, context, currencyPicker, binding.pickerCurrencyCircle)
+
+        binding.apply {
+            datePicker[picker1] = pickerText1
+            datePicker[picker2] = pickerText2
+            datePicker[picker3] = pickerText3
+            datePicker[picker4] = pickerText4
+            datePicker[picker5] = pickerText5
+            datePicker[picker6] = pickerText6
+        }
+
+        PickerAnimator {
+            Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
+        }.animate(resources, context, datePicker, binding.pickerCircle)
 
         binding.apply {
             ivBack.setOnClickListener {
