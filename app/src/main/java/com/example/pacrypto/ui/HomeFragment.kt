@@ -93,15 +93,19 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         adapterType1.updateList(getTestList())
 
         binding.tvHeader.setOnClickListener {
-            if (extendedAdapter) {
-                binding.rv.adapter = adapterType2
-                adapterType2.updateList(getTestList())
-                extendedAdapter = false
-            } else {
-                binding.rv.adapter = adapterType1
-                adapterType1.updateList(getTestList())
-                extendedAdapter = true
-            }
+            swapAdapter(binding)
+        }
+    }
+
+    private fun swapAdapter(binding: FragmentHomeBinding) {
+        if (extendedAdapter) {
+            binding.rv.adapter = adapterType2
+            adapterType2.updateList(getTestList())
+            extendedAdapter = false
+        } else {
+            binding.rv.adapter = adapterType1
+            adapterType1.updateList(getTestList())
+            extendedAdapter = true
         }
     }
 
