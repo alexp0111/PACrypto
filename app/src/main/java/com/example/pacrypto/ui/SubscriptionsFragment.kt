@@ -5,9 +5,11 @@ import androidx.fragment.app.Fragment
 import android.view.View
 import com.example.pacrypto.R
 import com.example.pacrypto.databinding.FragmentSubscriptionsBinding
+import dagger.hilt.android.AndroidEntryPoint
 
 private const val TAG = "SUBSCRIPTIONS_FRAGMENT"
 
+@AndroidEntryPoint
 class SubscriptionsFragment : Fragment(R.layout.fragment_subscriptions) {
 
     private var fragmentSubscriptionsBinding: FragmentSubscriptionsBinding? = null

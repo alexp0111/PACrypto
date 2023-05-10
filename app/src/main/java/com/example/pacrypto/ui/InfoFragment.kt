@@ -10,9 +10,11 @@ import androidx.fragment.app.Fragment
 import com.example.pacrypto.animator.PickerAnimator
 import com.example.pacrypto.R
 import com.example.pacrypto.databinding.FragmentInfoBinding
+import dagger.hilt.android.AndroidEntryPoint
 
 private const val TAG = "INFO_FRAGMENT"
 
+@AndroidEntryPoint
 class InfoFragment : Fragment(R.layout.fragment_info) {
 
 

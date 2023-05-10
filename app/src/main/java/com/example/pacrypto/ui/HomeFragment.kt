@@ -17,9 +17,11 @@ import com.example.pacrypto.animator.SwipeGesture
 import com.example.pacrypto.data.CurrencyInfo
 import com.example.pacrypto.databinding.FragmentHomeBinding
 import com.google.android.material.snackbar.Snackbar
+import dagger.hilt.android.AndroidEntryPoint
 
 private const val TAG = "HOME_FRAGMENT"
 
+@AndroidEntryPoint
 class HomeFragment : Fragment(R.layout.fragment_home) {
 
     private var fragmentHomeBinding: FragmentHomeBinding? = null
