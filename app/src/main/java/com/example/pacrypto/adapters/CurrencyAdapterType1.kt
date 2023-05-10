@@ -10,7 +10,7 @@ class CurrencyAdapterType1(
     val onItemClicked: (Int, CurrencyInfo) -> Unit
 ) : RecyclerView.Adapter<CurrencyAdapterType1.MyViewHolder>() {
 
-    private var list: List<CurrencyInfo> = arrayListOf()
+    private var list: ArrayList<CurrencyInfo> = arrayListOf()
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -26,7 +26,12 @@ class CurrencyAdapterType1(
         holder.bind(item)
     }
 
-    fun updateList(list: List<CurrencyInfo>) {
+    fun deleteItem(i: Int){
+        list.removeAt(i)
+        notifyItemRemoved(i)
+    }
+
+    fun updateList(list: ArrayList<CurrencyInfo>) {
         this.list = list
         notifyDataSetChanged()
     }
