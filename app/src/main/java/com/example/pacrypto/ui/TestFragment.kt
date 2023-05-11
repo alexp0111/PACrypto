@@ -8,6 +8,7 @@ import androidx.fragment.app.viewModels
 import com.example.pacrypto.R
 import com.example.pacrypto.databinding.FragmentInfoBinding
 import com.example.pacrypto.databinding.FragmentTestBinding
+import com.example.pacrypto.util.UiState
 import com.example.pacrypto.viewmodel.CoinViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -25,7 +26,16 @@ class TestFragment: Fragment(R.layout.fragment_test) {
         fragmentTestBinding = binding
 
         viewModel.assets.observe(viewLifecycleOwner){
-            binding.tvTest.text = (binding.tvTest.text.toString() + it.name + "\n")
+            if (it is UiState.Success){
+                val list = it.data
+                var str = ""
+                list.forEach {
+                    str += it.asset_id + "/" + it.name + "\n"
+                }
+                binding.tvTest.text = str
+            } else if (it is UiState.Failure){
+                binding.tvTest.text = it.error
+            }
         }
     }
 

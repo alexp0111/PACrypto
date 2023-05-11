@@ -1,6 +1,9 @@
 package com.example.pacrypto.di
 
+import android.app.Application
+import androidx.room.Room
 import com.example.pacrypto.api.CoinApi
+import com.example.pacrypto.data.room.CoinDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -24,4 +27,11 @@ object AppModule {
     @Singleton
     fun provideCoinApi(retrofit: Retrofit): CoinApi =
         retrofit.create(CoinApi::class.java)
+
+    @Provides
+    @Singleton
+    fun provideDatabase(app: Application): CoinDatabase =
+        Room.databaseBuilder(app, CoinDatabase::class.java, "coin_database")
+            .fallbackToDestructiveMigration()
+            .build()
 }

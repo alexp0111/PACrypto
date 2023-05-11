@@ -7,7 +7,7 @@ import retrofit2.http.Headers
 interface CoinApi {
 
     companion object {
-        const val BASE_URL = "https://rest-sandbox.coinapi.io/v1/"
+        const val BASE_URL = "https://rest.coinapi.io/v1/"
         const val API_KEY = "373D10A6-2055-4A39-BC5D-65BD1685C0AD"
     }
 

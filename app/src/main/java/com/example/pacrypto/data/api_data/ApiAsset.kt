@@ -1,5 +1,8 @@
 package com.example.pacrypto.data.api_data
 
+import com.example.pacrypto.data.room.DBAsset
+
+
 data class ApiAsset(
     val asset_id: String,
     val data_end: String,
