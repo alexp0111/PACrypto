@@ -1,6 +1,7 @@
 package com.example.pacrypto.ui
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -8,7 +9,11 @@ import com.example.pacrypto.R
 import com.example.pacrypto.databinding.FragmentInfoBinding
 import com.example.pacrypto.databinding.FragmentTestBinding
 import com.example.pacrypto.viewmodel.CoinViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
+private const val TAG = "TEST_FRAGMENT"
+
+@AndroidEntryPoint
 class TestFragment: Fragment(R.layout.fragment_test) {
 
     private var fragmentTestBinding: FragmentTestBinding? = null
@@ -20,7 +25,7 @@ class TestFragment: Fragment(R.layout.fragment_test) {
         fragmentTestBinding = binding
 
         viewModel.assets.observe(viewLifecycleOwner){
-            // list of api assets
+            binding.tvTest.text = (binding.tvTest.text.toString() + it.name + "\n")
         }
     }
 

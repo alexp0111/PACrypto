@@ -62,7 +62,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         // subscriptions button listener
         binding.ivSub.setOnClickListener {
             parentFragmentManager.beginTransaction()
-                .replace(R.id.container_main, InfoFragment())
+                .replace(R.id.container_main, TestFragment())
                 .addToBackStack(null).commit()
         }
 
