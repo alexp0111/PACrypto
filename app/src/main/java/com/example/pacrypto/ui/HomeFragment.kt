@@ -5,6 +5,7 @@ import android.view.View
 import android.widget.TextView
 import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -16,8 +17,11 @@ import com.example.pacrypto.animator.PickerAnimator
 import com.example.pacrypto.animator.SwipeGesture
 import com.example.pacrypto.data.CurrencyInfo
 import com.example.pacrypto.databinding.FragmentHomeBinding
+import com.example.pacrypto.util.AnimationDelays
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.*
+
 
 private const val TAG = "HOME_FRAGMENT"
 
@@ -26,6 +30,9 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
     private var fragmentHomeBinding: FragmentHomeBinding? = null
     private var currencyPicker = mutableMapOf<ConstraintLayout, TextView>()
+    private var fabAnimJob: Job? = null
+    private var fabState = FabState.HIDE
+    private var extendedAdapter = true
 
     val adapterType1 by lazy {
         CurrencyAdapterType1(
@@ -97,6 +104,42 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         binding.tvHeader.setOnClickListener {
             swapAdapter(binding)
         }
+
+        // Search bar
+        binding.apply {
+            etSearch.addTextChangedListener {
+                if (etSearch.text.isNullOrEmpty()) {
+                    fabState = FabState.HIDE
+                    fabRefresh.hide()
+                } else {
+                    fabState = FabState.SHOW
+                    fabRefresh.show()
+                }
+            }
+        }
+
+        // Handle fab visibility while scrolling
+        binding.rv.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                if (dy > 0 || dy < 0 && binding.fabRefresh.isShown()) {
+                    fabAnimJob?.cancel()
+                    binding.fabRefresh.hide()
+                }
+            }
+
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                if (fabState == FabState.SHOW && newState == RecyclerView.SCROLL_STATE_IDLE) {
+                    fabAnimJob?.cancel()
+                    fabAnimJob = CoroutineScope(Dispatchers.Main).launch {
+                        delay(AnimationDelays.FABDelay)
+                        binding.fabRefresh.show()
+                    }
+                } else if (fabState == FabState.SHOW && newState == RecyclerView.SCROLL_STATE_SETTLING) {
+                    binding.fabRefresh.show()
+                }
+                super.onScrollStateChanged(recyclerView, newState)
+            }
+        })
     }
 
     private fun swapAdapter(binding: FragmentHomeBinding) {
@@ -123,6 +166,36 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                 "Etherium", "ETH", "2012-07-17", "2020-11-03", 254.8, null
             )
         )
+        list.add(
+            CurrencyInfo(
+                "Etherium", "ETH", "2012-07-17", "2020-11-03", 254.8, null
+            )
+        )
+        list.add(
+            CurrencyInfo(
+                "Etherium", "ETH", "2012-07-17", "2020-11-03", 254.8, null
+            )
+        )
+        list.add(
+            CurrencyInfo(
+                "Etherium", "ETH", "2012-07-17", "2020-11-03", 254.8, null
+            )
+        )
+        list.add(
+            CurrencyInfo(
+                "Etherium", "ETH", "2012-07-17", "2020-11-03", 254.8, null
+            )
+        )
+        list.add(
+            CurrencyInfo(
+                "Etherium", "ETH", "2012-07-17", "2020-11-03", 254.8, null
+            )
+        )
+        list.add(
+            CurrencyInfo(
+                "Etherium", "ETH", "2012-07-17", "2020-11-03", 254.8, null
+            )
+        )
         return list
     }
 
@@ -131,7 +204,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         super.onDestroy()
     }
 
-    companion object {
-        var extendedAdapter = true
+    enum class FabState {
+        SHOW, HIDE
     }
 }

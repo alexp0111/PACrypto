@@ -1,6 +1,7 @@
 package com.example.pacrypto.ui
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -36,15 +37,17 @@ class TestFragment : Fragment(R.layout.fragment_test) {
                 viewModel.assets.collect {
                     val result = it ?: return@collect
 
-                    if (it is UiState.Success) {
-                        val list = it.data
+
+                    if (result is UiState.Success) {
+                        Log.d(TAG, result.data.size.toString())
+                        val list = result.data
                         var str = ""
                         list.forEach {
                             str += it.asset_id + "/" + it.name + "\n"
                         }
                         binding.tvTest.text = str
-                    } else if (it is UiState.Failure) {
-                        binding.tvTest.text = it.error
+                    } else if (result is UiState.Failure) {
+                        binding.tvTest.text = result.error
                     }
                 }
             }
