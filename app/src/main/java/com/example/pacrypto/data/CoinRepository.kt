@@ -3,12 +3,12 @@ package com.example.pacrypto.data
 import android.util.Log
 import androidx.room.withTransaction
 import com.example.pacrypto.api.CoinApi
-import com.example.pacrypto.data.api_data.ApiAsset
 import com.example.pacrypto.data.room.CoinDatabase
 import com.example.pacrypto.data.room.DBAsset
+import com.example.pacrypto.util.UiState
 import com.example.pacrypto.util.asDBType
 import com.example.pacrypto.util.networkBoundResource
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.channelFlow
 import retrofit2.HttpException
 import java.io.IOException
 import javax.inject.Inject
@@ -42,7 +42,7 @@ class CoinRepository @Inject constructor(
             }
         },
         shouldFetch = {
-            if (forceRefresh){
+            if (forceRefresh) {
                 true
             } else {
                 true
@@ -50,10 +50,31 @@ class CoinRepository @Inject constructor(
         },
         onFetchSuccess = onFetchSuccess,
         onFetchFailed = { error ->
-            if (error !is HttpException && error !is IOException){
+            if (error !is HttpException && error !is IOException) {
                 throw error
             }
             onFetchFailed(error)
         }
     )
+
+    /*
+    fun getAssetsByTicker(
+        ticker: String,
+    ) = networkBoundResource(
+        query = {
+            coinDao.getAssetsByTicker()
+        },
+        fetch = { mutableListOf<DBAsset>() },
+        shouldFetch = {
+            false
+        },
+        saveFetchResult = {}
+    )
+    */
+
+    fun getAssetsByTicker(
+        ticker: String,
+    ) = channelFlow<UiState<List<DBAsset>>> {
+        coinDao.getAssetsByTicker(ticker).collect { send(UiState.Success(it)) }
+    }
 }

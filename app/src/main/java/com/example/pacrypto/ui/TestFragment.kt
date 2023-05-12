@@ -29,12 +29,33 @@ class TestFragment : Fragment(R.layout.fragment_test) {
         fragmentTestBinding = binding
 
         binding.btnUpdate.setOnClickListener {
-            viewModel.updateAssets()
+            viewModel.getAssetByTicker("BUZ")
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.assets.collect {
+                viewModel.allAssets.collect {
+                    val result = it ?: return@collect
+
+
+                    if (result is UiState.Success) {
+                        Log.d(TAG, result.data.size.toString())
+                        val list = result.data
+                        var str = ""
+                        list.forEach {
+                            str += it.asset_id + "/" + it.name + "\n"
+                        }
+                        binding.tvTest.text = str
+                    } else if (result is UiState.Failure) {
+                        binding.tvTest.text = result.error
+                    }
+                }
+            }
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.assetsByTicker.collect {
                     val result = it ?: return@collect
 
 
@@ -56,7 +77,7 @@ class TestFragment : Fragment(R.layout.fragment_test) {
 
     override fun onStart() {
         super.onStart()
-        viewModel.onStart()
+        //viewModel.onStart()
     }
 
     override fun onDestroy() {

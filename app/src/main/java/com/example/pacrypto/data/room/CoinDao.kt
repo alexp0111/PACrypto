@@ -12,6 +12,9 @@ interface CoinDao {
     @Query("SELECT * FROM assets")
     fun getAllAssets(): Flow<List<DBAsset>>
 
+    @Query("SELECT * FROM assets WHERE asset_id LIKE '%' || :ticker || '%'")
+    fun getAssetsByTicker(ticker: String): Flow<List<DBAsset>>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAssets(restaurants: List<DBAsset>)
 

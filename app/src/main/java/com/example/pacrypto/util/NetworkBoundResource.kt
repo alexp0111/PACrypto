@@ -8,7 +8,7 @@ import kotlinx.coroutines.launch
 inline fun <ResultType, RequestType> networkBoundResource(
     crossinline query: () -> Flow<ResultType>,
     crossinline fetch: suspend () -> RequestType,
-    crossinline saveFetchResult: suspend (RequestType) -> Unit,
+    crossinline saveFetchResult: suspend (RequestType) -> Unit = { },
     crossinline shouldFetch: (ResultType) -> Boolean = { true },
     crossinline onFetchSuccess: () -> Unit = { },
     crossinline onFetchFailed: (Throwable) -> Unit = { }

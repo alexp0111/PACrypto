@@ -1,11 +1,15 @@
 package com.example.pacrypto.viewmodel
 
-import androidx.lifecycle.*
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.pacrypto.data.CoinRepository
 import com.example.pacrypto.util.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -17,10 +21,13 @@ class CoinViewModel @Inject constructor(
     private val eventChannel = Channel<Event>()
     val events = eventChannel.receiveAsFlow()
 
-    private val refreshTriggerChannel = Channel<Refresh>()
-    private val refreshTrigger = refreshTriggerChannel.receiveAsFlow()
+    private val refreshTriggerChannelForAllAssets = Channel<Refresh>()
+    private val refreshTriggerForAllAssets = refreshTriggerChannelForAllAssets.receiveAsFlow()
 
-    val assets = refreshTrigger.flatMapLatest { refresh ->
+    private val refreshTriggerChannelForTickerAssets = Channel<String>()
+    private val refreshTriggerForTickerAssets = refreshTriggerChannelForTickerAssets.receiveAsFlow()
+
+    val allAssets = refreshTriggerForAllAssets.flatMapLatest { refresh ->
         repository.getAssets(
             refresh == Refresh.FORCE,
             onFetchSuccess = {
@@ -34,18 +41,32 @@ class CoinViewModel @Inject constructor(
         )
     }.stateIn(viewModelScope, SharingStarted.Lazily, null)
 
+
+    val assetsByTicker = refreshTriggerForTickerAssets.flatMapLatest { ticker ->
+        repository.getAssetsByTicker(ticker)
+    }.stateIn(viewModelScope, SharingStarted.Lazily, null)
+
+
     fun onStart() {
-        if (assets.value !is UiState.Loading) {
+        if (allAssets.value !is UiState.Loading) {
             viewModelScope.launch {
-                refreshTriggerChannel.send(Refresh.NORMAL)
+                refreshTriggerChannelForAllAssets.send(Refresh.NORMAL)
+            }
+        }
+    }
+
+    fun getAssetByTicker(ticker: String) {
+        if (assetsByTicker.value !is UiState.Loading) {
+            viewModelScope.launch {
+                refreshTriggerChannelForTickerAssets.send(ticker)
             }
         }
     }
 
     fun updateAssets() {
-        if (assets.value !is UiState.Loading) {
+        if (allAssets.value !is UiState.Loading) {
             viewModelScope.launch {
-                refreshTriggerChannel.send(Refresh.FORCE)
+                refreshTriggerChannelForAllAssets.send(Refresh.FORCE)
             }
         }
     }

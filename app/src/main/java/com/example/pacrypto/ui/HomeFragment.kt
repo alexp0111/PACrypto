@@ -111,9 +111,13 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                 if (etSearch.text.isNullOrEmpty()) {
                     fabState = FabState.HIDE
                     fabRefresh.hide()
+
+                    binding.tvHeader.text = "Закладки"
                 } else {
                     fabState = FabState.SHOW
                     fabRefresh.show()
+
+                    binding.tvHeader.text = "По запросу"
                 }
             }
         }
