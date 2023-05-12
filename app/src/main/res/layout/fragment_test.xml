@@ -7,6 +7,15 @@
     android:background="@color/background_main"
     tools:context=".ui.TestFragment">
 
+    <Button
+        android:layout_margin="@dimen/basic_margin"
+        android:id="@+id/btn_update"
+        android:text="update"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/tv_test" />
+
     <TextView
         android:id="@+id/tv_test"
         app:layout_constraintTop_toTopOf="parent"

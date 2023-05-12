@@ -9,6 +9,8 @@ import com.example.pacrypto.data.room.DBAsset
 import com.example.pacrypto.util.asDBType
 import com.example.pacrypto.util.networkBoundResource
 import kotlinx.coroutines.delay
+import retrofit2.HttpException
+import java.io.IOException
 import javax.inject.Inject
 
 private const val TAG = "COIN_REPOSITORY"
@@ -19,7 +21,11 @@ class CoinRepository @Inject constructor(
 ) {
     private val coinDao = db.coinDao()
 
-    fun getAssets() = networkBoundResource(
+    fun getAssets(
+        forceRefresh: Boolean,
+        onFetchSuccess: () -> Unit,
+        onFetchFailed: (Throwable) -> Unit
+    ) = networkBoundResource(
         query = {
             coinDao.getAllAssets()
         },
@@ -28,12 +34,26 @@ class CoinRepository @Inject constructor(
         },
         saveFetchResult = { assets ->
             assets.forEach {
-                Log.d(TAG, it.asset_id.toString())
+                Log.d(TAG, it.asset_id)
             }
             db.withTransaction {
                 coinDao.deleteAllAssets()
                 coinDao.insertAssets(assets.asDBType())
             }
+        },
+        shouldFetch = {
+            if (forceRefresh){
+                true
+            } else {
+                true
+            }
+        },
+        onFetchSuccess = onFetchSuccess,
+        onFetchFailed = { error ->
+            if (error !is HttpException && error !is IOException){
+                throw error
+            }
+            onFetchFailed(error)
         }
     )
 }
