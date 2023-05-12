@@ -18,26 +18,34 @@
             android:layout_width="0dp"
             android:layout_height="@dimen/card_hat"
             android:background="@drawable/card_coin_hat"
-            app:layout_constraintEnd_toStartOf="@+id/cl_end"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
             <LinearLayout
                 android:id="@+id/ll_ticker_and_name"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/basic_margin"
+                android:gravity="start"
                 android:orientation="vertical"
                 app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/tv_value"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
 
                 <TextView
                     android:id="@+id/tv_ticker"
                     style="@style/TextHeader"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:ellipsize="marquee"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"
                     android:fontFamily="@font/inter_regular"
+                    android:marqueeRepeatLimit="marquee_forever"
+                    android:scrollHorizontally="true"
+                    android:singleLine="true"
                     android:text="BTC" />
 
                 <TextView
@@ -55,6 +63,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/basic_margin"
+                android:ellipsize="marquee"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:gravity="end"
+                android:marqueeRepeatLimit="marquee_forever"
+                android:maxLines="1"
+                android:scrollHorizontally="true"
+                android:singleLine="true"
                 android:text="285.4$"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -65,24 +81,24 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/cl_end"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="0dp"
             android:background="@drawable/card_coin_end"
             app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@id/tv_update_date"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toBottomOf="@id/cl_hat">
 
             <TextView
                 android:id="@+id/tv_percents"
                 style="@style/TextHeader"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/basic_margin"
                 android:gravity="center"
                 android:text="+3.11%"
                 android:textColor="@color/background_main"
+                app:layout_constraintEnd_toStartOf="@id/tv_period"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -91,12 +107,13 @@
                 style="@style/TextAcc"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="center"
+                android:layout_margin="@dimen/basic_margin"
+                android:gravity="start"
                 android:text="за день"
                 android:textColor="@color/background_main"
-                app:layout_constraintEnd_toEndOf="@+id/tv_percents"
-                app:layout_constraintStart_toStartOf="@+id/tv_percents"
-                app:layout_constraintTop_toBottomOf="@+id/tv_percents" />
+                app:layout_constraintBottom_toBottomOf="@+id/tv_percents"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/tv_percents" />
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>
@@ -105,10 +122,11 @@
         <TextView
             android:id="@+id/tv_update_date"
             style="@style/TextAcc"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
+            android:layout_marginHorizontal="@dimen/basic_margin"
             android:layout_height="0dp"
             android:gravity="center"
-            android:text="2017-08-09 14:31:37"
+            android:text="2017-08-09\n14:31:37"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/cl_end"
             app:layout_constraintStart_toStartOf="parent"

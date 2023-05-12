@@ -1,12 +1,17 @@
 package com.example.pacrypto.ui
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.TextView
 import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -16,8 +21,11 @@ import com.example.pacrypto.adapters.CurrencyAdapterType2
 import com.example.pacrypto.animator.PickerAnimator
 import com.example.pacrypto.animator.SwipeGesture
 import com.example.pacrypto.data.CurrencyInfo
+import com.example.pacrypto.data.room.DBAsset
 import com.example.pacrypto.databinding.FragmentHomeBinding
 import com.example.pacrypto.util.AnimationDelays
+import com.example.pacrypto.util.UiState
+import com.example.pacrypto.viewmodel.CoinViewModel
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
@@ -27,6 +35,8 @@ private const val TAG = "HOME_FRAGMENT"
 
 @AndroidEntryPoint
 class HomeFragment : Fragment(R.layout.fragment_home) {
+
+    private val viewModel: CoinViewModel by viewModels()
 
     private var fragmentHomeBinding: FragmentHomeBinding? = null
     private var currencyPicker = mutableMapOf<ConstraintLayout, TextView>()
@@ -55,16 +65,21 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         val binding = FragmentHomeBinding.bind(view)
         fragmentHomeBinding = binding
 
+
+        //set up observers
+        observers()
+
+
         // init picker
         binding.apply {
             currencyPicker[picker1] = pickerText1
             currencyPicker[picker2] = pickerText2
+
+            PickerAnimator {
+                Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
+            }.animate(resources, context, currencyPicker, pickerCircle)
         }
 
-
-        PickerAnimator {
-            Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
-        }.animate(resources, context, currencyPicker, binding.pickerCircle)
 
         // subscriptions button listener
         binding.ivSub.setOnClickListener {
@@ -72,6 +87,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                 .replace(R.id.container_main, TestFragment())
                 .addToBackStack(null).commit()
         }
+
 
         // Adapter
         val manager = LinearLayoutManager(context)
@@ -95,15 +111,16 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                 }
             }
         }
-
         val touchHelper = ItemTouchHelper(swipeGesture)
         touchHelper.attachToRecyclerView(binding.rv)
+        //adapterType1.updateList()
 
-        adapterType1.updateList(getTestList())
 
+        // header listener
         binding.tvHeader.setOnClickListener {
             swapAdapter(binding)
         }
+
 
         // Search bar
         binding.apply {
@@ -111,13 +128,15 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                 if (etSearch.text.isNullOrEmpty()) {
                     fabState = FabState.HIDE
                     fabRefresh.hide()
+                    tvHeader.text = "Закладки"
 
-                    binding.tvHeader.text = "Закладки"
+                    //TODO: set up bookmarks
                 } else {
                     fabState = FabState.SHOW
                     fabRefresh.show()
+                    tvHeader.text = "По запросу"
 
-                    binding.tvHeader.text = "По запросу"
+                    viewModel.getAssetByTicker(etSearch.text.toString())
                 }
             }
         }
@@ -146,14 +165,30 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         })
     }
 
+    private fun observers() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.assetsByTicker.collect {
+                    val result = it ?: return@collect
+
+                    if (result is UiState.Success) {
+                        adapterType1.updateList(result.data as ArrayList<DBAsset>)
+                    } else if (result is UiState.Failure) {
+                        // error msg
+                    }
+                }
+            }
+        }
+    }
+
     private fun swapAdapter(binding: FragmentHomeBinding) {
         if (extendedAdapter) {
             binding.rv.adapter = adapterType2
-            adapterType2.updateList(getTestList())
+            //adapterType2.updateList(getTestList())
             extendedAdapter = false
         } else {
             binding.rv.adapter = adapterType1
-            adapterType1.updateList(getTestList())
+            //adapterType1.updateList(getTestList())
             extendedAdapter = true
         }
     }

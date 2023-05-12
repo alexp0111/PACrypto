@@ -3,7 +3,7 @@
     <dimen name="header_text_size">28sp</dimen>
     <dimen name="mid_text_size">14sp</dimen>
     <dimen name="basic_margin">16dp</dimen>
-    <dimen name="card_height_type_1">140dp</dimen>
+    <dimen name="card_height_type_1">160dp</dimen>
     <dimen name="card_corner_radius">16dp</dimen>
     <dimen name="card_elevation">6dp</dimen>
     <dimen name="card_hat">100dp</dimen>
