@@ -23,4 +23,7 @@ interface AssetDao {
     @Query("SELECT * FROM assets WHERE asset_id LIKE '%' || :ticker || '%'")
     fun getAssetsByTicker(ticker: String): Flow<List<DBAsset>>
 
+    @Query("SELECT * FROM assets WHERE name LIKE '%' || :name || '%'")
+    fun getAssetsByName(name: String): Flow<List<DBAsset>>
+
 }

@@ -6,6 +6,8 @@ import com.example.pacrypto.api.CoinApi
 import com.example.pacrypto.data.room.assets.AssetDatabase
 import com.example.pacrypto.data.room.assets.DBAsset
 import com.example.pacrypto.data.room.rates.RateDatabase
+import com.example.pacrypto.ui.HomeFragment
+import com.example.pacrypto.util.SearchType
 import com.example.pacrypto.util.UiState
 import com.example.pacrypto.util.asDBType
 import com.example.pacrypto.util.networkBoundResource
@@ -21,7 +23,7 @@ class CoinRepository @Inject constructor(
     private val db_asset: AssetDatabase,
     private val db_rate: RateDatabase
 ) {
-    private val coinDao = db_asset.assetDao()
+    private val assetDao = db_asset.assetDao()
     private val rateDao = db_rate.rateDao()
 
     fun getAssets(
@@ -30,7 +32,7 @@ class CoinRepository @Inject constructor(
         onFetchFailed: (Throwable) -> Unit
     ) = networkBoundResource(
         query = {
-            coinDao.getAllAssets()
+            assetDao.getAllAssets()
         },
         fetch = {
             api.getAssets()
@@ -40,8 +42,8 @@ class CoinRepository @Inject constructor(
                 Log.d(TAG, it.asset_id)
             }
             db_asset.withTransaction {
-                coinDao.deleteAllAssets()
-                coinDao.insertAssets(assets.asDBType())
+                assetDao.deleteAllAssets()
+                assetDao.insertAssets(assets.asDBType())
             }
         },
         shouldFetch = {
@@ -149,9 +151,13 @@ class CoinRepository @Inject constructor(
     )
     */
 
-    fun getAssetsByTicker(
-        ticker: String,
+    fun getExactAsset(
+        pair: Pair<String, SearchType>,
     ) = channelFlow<UiState<List<DBAsset>>> {
-        coinDao.getAssetsByTicker(ticker).collect { send(UiState.Success(it)) }
+        if (pair.second == SearchType.NAME) {
+            assetDao.getAssetsByName(pair.first).collect { send(UiState.Success(it)) }
+        } else {
+            assetDao.getAssetsByTicker(pair.first).collect { send(UiState.Success(it)) }
+        }
     }
 }

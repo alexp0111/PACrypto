@@ -1,11 +1,11 @@
 package com.example.pacrypto.ui
 
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.TextView
 import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -23,10 +23,7 @@ import com.example.pacrypto.animator.SwipeGesture
 import com.example.pacrypto.data.SearchItem
 import com.example.pacrypto.data.room.rates.Rate
 import com.example.pacrypto.databinding.FragmentHomeBinding
-import com.example.pacrypto.util.AnimationDelays
-import com.example.pacrypto.util.UiState
-import com.example.pacrypto.util.addAssets
-import com.example.pacrypto.util.addRates
+import com.example.pacrypto.util.*
 import com.example.pacrypto.viewmodel.CoinViewModel
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
@@ -95,8 +92,44 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                     searchItemList.addRates(ratesRUB)
                     adapterType1.setRateMarker("₽")
                 }
-                viewModel.getAssetByTicker(etSearch.text.toString())
+                viewModel.getExactAsset(etSearch.text.toString(), searchType)
             }.animate(resources, context, currencyPicker, pickerCircle)
+        }
+
+
+        // searchType picker
+        binding.apply {
+            tvName.setOnClickListener {
+                searchType = SearchType.NAME
+                tvName.setTextColor(
+                    ContextCompat.getColor(
+                        requireContext(),
+                        R.color.picker_text_on
+                    )
+                )
+                tvTicker.setTextColor(
+                    ContextCompat.getColor(
+                        requireContext(),
+                        R.color.picker_text_off
+                    )
+                )
+            }
+
+            tvTicker.setOnClickListener {
+                searchType = SearchType.TICKER
+                tvTicker.setTextColor(
+                    ContextCompat.getColor(
+                        requireContext(),
+                        R.color.picker_text_on
+                    )
+                )
+                tvName.setTextColor(
+                    ContextCompat.getColor(
+                        requireContext(),
+                        R.color.picker_text_off
+                    )
+                )
+            }
         }
 
 
@@ -149,13 +182,23 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                     fabRefresh.hide()
                     tvHeader.text = "Закладки"
 
+                    tvName.visibility = View.GONE
+                    tvTicker.visibility = View.GONE
+                    ivQr.visibility = View.VISIBLE
+                    ivSub.visibility = View.VISIBLE
+
                     //TODO: set up bookmarks
                 } else {
                     fabState = FabState.SHOW
                     fabRefresh.show()
                     tvHeader.text = "По запросу"
 
-                    viewModel.getAssetByTicker(etSearch.text.toString())
+                    tvName.visibility = View.VISIBLE
+                    tvTicker.visibility = View.VISIBLE
+                    ivQr.visibility = View.GONE
+                    ivSub.visibility = View.GONE
+
+                    viewModel.getExactAsset(etSearch.text.toString(), searchType)
                 }
             }
         }
@@ -261,7 +304,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         // Search results
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.assetsByTicker.collect {
+                viewModel.exactAsset.collect {
                     val result = it ?: return@collect
 
                     if (result is UiState.Success) {
@@ -297,17 +340,5 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     override fun onDestroy() {
         fragmentHomeBinding = null
         super.onDestroy()
-    }
-
-    enum class FabState {
-        SHOW, HIDE
-    }
-
-    enum class SearchType {
-        TICKER, NAME
-    }
-
-    enum class SearchRate {
-        USD, RUB
     }
 }

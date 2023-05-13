@@ -3,6 +3,8 @@ package com.example.pacrypto.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.pacrypto.data.CoinRepository
+import com.example.pacrypto.ui.HomeFragment
+import com.example.pacrypto.util.SearchType
 import com.example.pacrypto.util.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
@@ -28,8 +30,8 @@ class CoinViewModel @Inject constructor(
     private val refreshTriggerChannelForAllAssets = Channel<Refresh>()
     private val refreshTriggerForAllAssets = refreshTriggerChannelForAllAssets.receiveAsFlow()
 
-    private val refreshTriggerChannelForTickerAssets = Channel<String>()
-    private val refreshTriggerForTickerAssets = refreshTriggerChannelForTickerAssets.receiveAsFlow()
+    private val refreshTriggerChannelForExactAssets = Channel<Pair<String, SearchType>>()
+    private val refreshTriggerForExactAssets = refreshTriggerChannelForExactAssets.receiveAsFlow()
 
     private val refreshTriggerChannelForAllUSDRates = Channel<String>()
     private val refreshTriggerForAllUSDRates = refreshTriggerChannelForAllUSDRates.receiveAsFlow()
@@ -80,8 +82,8 @@ class CoinViewModel @Inject constructor(
     }.stateIn(viewModelScope, SharingStarted.Lazily, null)
 
 
-    val assetsByTicker = refreshTriggerForTickerAssets.flatMapLatest { ticker ->
-        repository.getAssetsByTicker(ticker)
+    val exactAsset = refreshTriggerForExactAssets.flatMapLatest { pair ->
+        repository.getExactAsset(pair)
     }.stateIn(viewModelScope, SharingStarted.Lazily, null)
 
 
@@ -102,10 +104,10 @@ class CoinViewModel @Inject constructor(
         }
     }
 
-    fun getAssetByTicker(ticker: String) {
-        if (assetsByTicker.value !is UiState.Loading) {
+    fun getExactAsset(searchTool: String, type: SearchType) {
+        if (exactAsset.value !is UiState.Loading) {
             viewModelScope.launch {
-                refreshTriggerChannelForTickerAssets.send(ticker)
+                refreshTriggerChannelForExactAssets.send(Pair(searchTool, type))
             }
         }
     }
