@@ -11,7 +11,11 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.*
 import javax.inject.Inject
+
+private const val TAG = "COIN_VIEW_MODEL"
 
 @HiltViewModel
 class CoinViewModel @Inject constructor(
@@ -27,9 +31,15 @@ class CoinViewModel @Inject constructor(
     private val refreshTriggerChannelForTickerAssets = Channel<String>()
     private val refreshTriggerForTickerAssets = refreshTriggerChannelForTickerAssets.receiveAsFlow()
 
+    private val refreshTriggerChannelForAllUSDRates = Channel<String>()
+    private val refreshTriggerForAllUSDRates = refreshTriggerChannelForAllUSDRates.receiveAsFlow()
+
+    private val refreshTriggerChannelForAllRUBRates = Channel<String>()
+    private val refreshTriggerForAllRUBRates = refreshTriggerChannelForAllRUBRates.receiveAsFlow()
+
     val allAssets = refreshTriggerForAllAssets.flatMapLatest { refresh ->
         repository.getAssets(
-            refresh == Refresh.FORCE,
+            forceRefresh = refresh == Refresh.FORCE,
             onFetchSuccess = {
                 //TODO:
             },
@@ -41,6 +51,34 @@ class CoinViewModel @Inject constructor(
         )
     }.stateIn(viewModelScope, SharingStarted.Lazily, null)
 
+    val allUSDRates = refreshTriggerForAllUSDRates.flatMapLatest { time ->
+        repository.getUSDRates(
+            time = time,
+            forceRefresh = true,
+            onFetchSuccess = {
+                //TODO:
+            }
+        ) { error ->
+            viewModelScope.launch {
+                eventChannel.send(Event.ShowErrorMessage(error))
+            }
+        }
+    }.stateIn(viewModelScope, SharingStarted.Lazily, null)
+
+    val allRUBRates = refreshTriggerForAllRUBRates.flatMapLatest { time ->
+        repository.getRUBRates(
+            time = time,
+            forceRefresh = true,
+            onFetchSuccess = {
+                //TODO:
+            }
+        ) { error ->
+            viewModelScope.launch {
+                eventChannel.send(Event.ShowErrorMessage(error))
+            }
+        }
+    }.stateIn(viewModelScope, SharingStarted.Lazily, null)
+
 
     val assetsByTicker = refreshTriggerForTickerAssets.flatMapLatest { ticker ->
         repository.getAssetsByTicker(ticker)
@@ -48,9 +86,18 @@ class CoinViewModel @Inject constructor(
 
 
     fun onStart() {
-        if (allAssets.value !is UiState.Loading) {
+        if (allAssets.value !is UiState.Loading
+            && allUSDRates.value !is UiState.Loading
+            && allRUBRates.value !is UiState.Loading) {
             viewModelScope.launch {
                 refreshTriggerChannelForAllAssets.send(Refresh.NORMAL)
+                val sdf = SimpleDateFormat("yyy-MM-dd'T'HH:mm:ss.SSS", Locale.getDefault())
+                refreshTriggerChannelForAllUSDRates.send(
+                    sdf.format(Calendar.getInstance().time)
+                )
+                refreshTriggerChannelForAllRUBRates.send(
+                    sdf.format(Calendar.getInstance().time)
+                )
             }
         }
     }

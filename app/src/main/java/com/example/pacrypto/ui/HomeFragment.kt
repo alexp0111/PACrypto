@@ -20,11 +20,13 @@ import com.example.pacrypto.adapters.CurrencyAdapterType1
 import com.example.pacrypto.adapters.CurrencyAdapterType2
 import com.example.pacrypto.animator.PickerAnimator
 import com.example.pacrypto.animator.SwipeGesture
-import com.example.pacrypto.data.CurrencyInfo
-import com.example.pacrypto.data.room.DBAsset
+import com.example.pacrypto.data.SearchItem
+import com.example.pacrypto.data.room.rates.Rate
 import com.example.pacrypto.databinding.FragmentHomeBinding
 import com.example.pacrypto.util.AnimationDelays
 import com.example.pacrypto.util.UiState
+import com.example.pacrypto.util.addAssets
+import com.example.pacrypto.util.addRates
 import com.example.pacrypto.viewmodel.CoinViewModel
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
@@ -38,10 +40,18 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
     private val viewModel: CoinViewModel by viewModels()
 
+    private var searchItemList = arrayListOf<SearchItem>()
+    private var ratesUSD = listOf<Rate>()
+    private var ratesRUB = listOf<Rate>()
+
     private var fragmentHomeBinding: FragmentHomeBinding? = null
     private var currencyPicker = mutableMapOf<ConstraintLayout, TextView>()
     private var fabAnimJob: Job? = null
+
     private var fabState = FabState.HIDE
+    private var searchType = SearchType.TICKER
+    private var searchRate = SearchRate.USD
+
     private var extendedAdapter = true
 
     val adapterType1 by lazy {
@@ -67,7 +77,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
 
         //set up observers
-        observers()
+        observers(binding)
 
 
         // init picker
@@ -76,7 +86,16 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
             currencyPicker[picker2] = pickerText2
 
             PickerAnimator {
-                Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
+                if (it == "$") {
+                    searchRate = SearchRate.USD
+                    searchItemList.addRates(ratesUSD)
+                    adapterType1.setRateMarker("$")
+                } else {
+                    searchRate = SearchRate.RUB
+                    searchItemList.addRates(ratesRUB)
+                    adapterType1.setRateMarker("₽")
+                }
+                viewModel.getAssetByTicker(etSearch.text.toString())
             }.animate(resources, context, currencyPicker, pickerCircle)
         }
 
@@ -165,14 +184,96 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         })
     }
 
-    private fun observers() {
+    override fun onStart() {
+        super.onStart()
+        viewModel.onStart()
+    }
+
+    private fun observers(binding: FragmentHomeBinding) {
+        // All assets
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.allAssets.collect {
+                    val result = it ?: return@collect
+
+                    if (result is UiState.Loading) {
+                        binding.etSearch.hint = "Обновляем данные"
+                        binding.etSearch.isEnabled = false
+                    }
+
+                    if (result is UiState.Success) {
+                        binding.etSearch.hint = "Найти..."
+                        binding.etSearch.isEnabled = true
+                    } else if (result is UiState.Failure) {
+                        binding.etSearch.hint = result.error.toString()
+                        binding.etSearch.isEnabled = true
+                    }
+                }
+            }
+        }
+
+        // Rates in USD
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.allUSDRates.collect {
+                    val result = it ?: return@collect
+
+                    if (result is UiState.Loading) {
+                        binding.etSearch.hint = "Обновляем данные"
+                        binding.etSearch.isEnabled = false
+                    }
+
+                    if (result is UiState.Success) {
+                        binding.etSearch.hint = "Найти..."
+                        binding.etSearch.isEnabled = true
+                        ratesUSD = result.data.rates
+                    } else if (result is UiState.Failure) {
+                        binding.etSearch.hint = result.error.toString()
+                        binding.etSearch.isEnabled = true
+                    }
+                }
+            }
+        }
+
+        // rates in RUB
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.allRUBRates.collect {
+                    val result = it ?: return@collect
+
+                    if (result is UiState.Loading) {
+                        binding.etSearch.hint = "Обновляем данные"
+                        binding.etSearch.isEnabled = false
+                    }
+
+                    if (result is UiState.Success) {
+                        binding.etSearch.hint = "Найти..."
+                        binding.etSearch.isEnabled = true
+                        ratesRUB = result.data.rates
+                    } else if (result is UiState.Failure) {
+                        binding.etSearch.hint = result.error.toString()
+                        binding.etSearch.isEnabled = true
+                    }
+                }
+            }
+        }
+
+        // Search results
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.assetsByTicker.collect {
                     val result = it ?: return@collect
 
                     if (result is UiState.Success) {
-                        adapterType1.updateList(result.data as ArrayList<DBAsset>)
+                        searchItemList.addAssets(result.data)
+                        if (searchRate == SearchRate.USD) {
+                            searchItemList.addRates(ratesUSD)
+                            adapterType1.setRateMarker("$")
+                        } else {
+                            searchItemList.addRates(ratesRUB)
+                            adapterType1.setRateMarker("₽")
+                        }
+                        adapterType1.updateList(searchItemList)
                     } else if (result is UiState.Failure) {
                         // error msg
                     }
@@ -193,51 +294,6 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         }
     }
 
-    private fun getTestList(): ArrayList<CurrencyInfo> {
-        val list = arrayListOf<CurrencyInfo>()
-        list.add(
-            CurrencyInfo(
-                "Bitcoin", "BTC", "2010-07-17", "2019-11-03", 1000.9, null
-            )
-        )
-        list.add(
-            CurrencyInfo(
-                "Etherium", "ETH", "2012-07-17", "2020-11-03", 254.8, null
-            )
-        )
-        list.add(
-            CurrencyInfo(
-                "Etherium", "ETH", "2012-07-17", "2020-11-03", 254.8, null
-            )
-        )
-        list.add(
-            CurrencyInfo(
-                "Etherium", "ETH", "2012-07-17", "2020-11-03", 254.8, null
-            )
-        )
-        list.add(
-            CurrencyInfo(
-                "Etherium", "ETH", "2012-07-17", "2020-11-03", 254.8, null
-            )
-        )
-        list.add(
-            CurrencyInfo(
-                "Etherium", "ETH", "2012-07-17", "2020-11-03", 254.8, null
-            )
-        )
-        list.add(
-            CurrencyInfo(
-                "Etherium", "ETH", "2012-07-17", "2020-11-03", 254.8, null
-            )
-        )
-        list.add(
-            CurrencyInfo(
-                "Etherium", "ETH", "2012-07-17", "2020-11-03", 254.8, null
-            )
-        )
-        return list
-    }
-
     override fun onDestroy() {
         fragmentHomeBinding = null
         super.onDestroy()
@@ -245,5 +301,13 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
     enum class FabState {
         SHOW, HIDE
+    }
+
+    enum class SearchType {
+        TICKER, NAME
+    }
+
+    enum class SearchRate {
+        USD, RUB
     }
 }

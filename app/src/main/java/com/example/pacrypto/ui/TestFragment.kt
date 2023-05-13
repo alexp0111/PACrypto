@@ -34,6 +34,27 @@ class TestFragment : Fragment(R.layout.fragment_test) {
 
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.allUSDRates.collect {
+                    val result = it ?: return@collect
+
+
+                    if (result is UiState.Success) {
+                        Log.d(TAG, result.data.rates.size.toString())
+                        val list = result.data.rates
+                        var str = ""
+                        list.forEach {
+                            str += it.rate.toString() + "/" + it.asset_id_quote + "/" + it.time + "\n"
+                        }
+                        binding.tvTest.text = str
+                    } else if (result is UiState.Failure) {
+                        binding.tvTest.text = result.error
+                    }
+                }
+            }
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.allAssets.collect {
                     val result = it ?: return@collect
 
@@ -45,7 +66,7 @@ class TestFragment : Fragment(R.layout.fragment_test) {
                         list.forEach {
                             str += it.asset_id + "/" + it.name + "\n"
                         }
-                        binding.tvTest.text = str
+                        // binding.tvTest.text = str
                     } else if (result is UiState.Failure) {
                         binding.tvTest.text = result.error
                     }

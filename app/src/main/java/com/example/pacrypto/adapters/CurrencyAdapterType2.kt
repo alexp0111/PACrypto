@@ -3,9 +3,7 @@ package com.example.pacrypto.adapters
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.example.pacrypto.data.CurrencyInfo
-import com.example.pacrypto.data.room.DBAsset
-import com.example.pacrypto.databinding.ItemCoinType1Binding
+import com.example.pacrypto.data.room.assets.DBAsset
 import com.example.pacrypto.databinding.ItemCoinType2Binding
 
 class CurrencyAdapterType2(

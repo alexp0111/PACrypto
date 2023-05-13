@@ -1,4 +1,4 @@
-package com.example.pacrypto.data.room
+package com.example.pacrypto.data.room.assets
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

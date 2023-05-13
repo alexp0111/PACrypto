@@ -1,5 +1,6 @@
 package com.example.pacrypto.util
 
+import android.util.Log
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.first
@@ -14,6 +15,7 @@ inline fun <ResultType, RequestType> networkBoundResource(
     crossinline onFetchFailed: (Throwable) -> Unit = { }
 ) = channelFlow {
     val data = query().first()
+    Log.d("QWERTY", "POIUY")
 
     if (shouldFetch(data)) {
         val loading = launch {

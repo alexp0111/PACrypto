@@ -3,7 +3,8 @@ package com.example.pacrypto.di
 import android.app.Application
 import androidx.room.Room
 import com.example.pacrypto.api.CoinApi
-import com.example.pacrypto.data.room.CoinDatabase
+import com.example.pacrypto.data.room.assets.AssetDatabase
+import com.example.pacrypto.data.room.rates.RateDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -30,8 +31,15 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideDatabase(app: Application): CoinDatabase =
-        Room.databaseBuilder(app, CoinDatabase::class.java, "coin_database")
+    fun provideAssetDatabase(app: Application): AssetDatabase =
+        Room.databaseBuilder(app, AssetDatabase::class.java, "coin_database")
+            .fallbackToDestructiveMigration()
+            .build()
+
+    @Provides
+    @Singleton
+    fun provideRateDatabase(app: Application): RateDatabase =
+        Room.databaseBuilder(app, RateDatabase::class.java, "rate_database")
             .fallbackToDestructiveMigration()
             .build()
 }
