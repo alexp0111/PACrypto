@@ -39,7 +39,7 @@ class TestFragment : Fragment(R.layout.fragment_test) {
 
 
                     if (result is UiState.Success) {
-                        Log.d(TAG, result.data.rates.size.toString())
+                        Log.d(TAG, result.data!!.rates.size.toString())
                         val list = result.data.rates
                         var str = ""
                         list.forEach {
@@ -60,10 +60,10 @@ class TestFragment : Fragment(R.layout.fragment_test) {
 
 
                     if (result is UiState.Success) {
-                        Log.d(TAG, result.data.size.toString())
+                        Log.d(TAG, result.data!!.size.toString())
                         val list = result.data
                         var str = ""
-                        list.forEach {
+                        list!!.forEach {
                             str += it.asset_id + "/" + it.name + "\n"
                         }
                         // binding.tvTest.text = str

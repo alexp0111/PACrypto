@@ -9,7 +9,7 @@ import dagger.hilt.android.AndroidEntryPoint
 //TODO:
 // 1. Bookmarks
 // 2. updating
-// 3. All necessary date for cards in search
+// 3. [ All necessary date for cards in search ]
 // 4. Changing cards \ [currency] \ [input type]
 // 5. Info stuff
 // 6. QR

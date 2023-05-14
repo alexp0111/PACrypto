@@ -10,10 +10,10 @@ import com.example.pacrypto.R
 import com.example.pacrypto.data.SearchItem
 import com.example.pacrypto.databinding.ItemCoinType1Binding
 
-class CurrencyAdapterType1(
+class CoinAdapter(
     val context: Context,
     val onItemClicked: (Int, SearchItem) -> Unit
-) : RecyclerView.Adapter<CurrencyAdapterType1.MyViewHolder>() {
+) : RecyclerView.Adapter<CoinAdapter.MyViewHolder>() {
 
     private var searchItemList: ArrayList<SearchItem> = arrayListOf()
     private var rateMarker: String = "$"
@@ -21,7 +21,7 @@ class CurrencyAdapterType1(
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
-    ): CurrencyAdapterType1.MyViewHolder {
+    ): CoinAdapter.MyViewHolder {
         val itemView =
             ItemCoinType1Binding.inflate(LayoutInflater.from(parent.context), parent, false)
         return MyViewHolder(itemView)

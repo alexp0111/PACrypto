@@ -14,17 +14,17 @@ interface CoinApi {
         const val API_KEY_RESERVED = "F4D66C7B-04A8-4715-9F14-A15074A4F322"
     }
 
-    @Headers("X-CoinAPI-Key: $API_KEY_RESERVED")
+    @Headers("X-CoinAPI-Key: $API_KEY")
     @GET("assets")
     suspend fun getAssets(): List<ApiAsset>
 
-    @Headers("X-CoinAPI-Key: $API_KEY_RESERVED")
+    @Headers("X-CoinAPI-Key: $API_KEY")
     @GET("exchangerate/USD")
     suspend fun getUSDRates(
         @Query("time") time: String
     ): ApiListRates
 
-    @Headers("X-CoinAPI-Key: $API_KEY_RESERVED")
+    @Headers("X-CoinAPI-Key: $API_KEY")
     @GET("exchangerate/RUB")
     suspend fun getRUBRates(
         @Query("time") time: String

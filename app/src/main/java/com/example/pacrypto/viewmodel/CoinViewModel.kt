@@ -3,12 +3,14 @@ package com.example.pacrypto.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.pacrypto.data.CoinRepository
+import com.example.pacrypto.util.Refresh
 import com.example.pacrypto.util.SearchType
-import com.example.pacrypto.util.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
@@ -21,9 +23,6 @@ class CoinViewModel @Inject constructor(
     val repository: CoinRepository
 ) : ViewModel() {
 
-    private val eventChannel = Channel<Event>()
-    val events = eventChannel.receiveAsFlow()
-
     private val refreshTriggerChannelForAllAssets = Channel<Refresh>()
     private val refreshTriggerForAllAssets = refreshTriggerChannelForAllAssets.receiveAsFlow()
 
@@ -33,95 +32,44 @@ class CoinViewModel @Inject constructor(
     //
 
     private val refreshTriggerChannelForAllUSDRatesAct = Channel<String>()
-    private val refreshTriggerForAllUSDRatesAct = refreshTriggerChannelForAllUSDRatesAct.receiveAsFlow()
+    private val refreshTriggerForAllUSDRatesAct =
+        refreshTriggerChannelForAllUSDRatesAct.receiveAsFlow()
 
     private val refreshTriggerChannelForAllRUBRatesAct = Channel<String>()
-    private val refreshTriggerForAllRUBRatesAct = refreshTriggerChannelForAllRUBRatesAct.receiveAsFlow()
+    private val refreshTriggerForAllRUBRatesAct =
+        refreshTriggerChannelForAllRUBRatesAct.receiveAsFlow()
 
     //
 
     private val refreshTriggerChannelForAllUSDRatesPrv = Channel<String>()
-    private val refreshTriggerForAllUSDRatesPrv = refreshTriggerChannelForAllUSDRatesPrv.receiveAsFlow()
+    private val refreshTriggerForAllUSDRatesPrv =
+        refreshTriggerChannelForAllUSDRatesPrv.receiveAsFlow()
 
     private val refreshTriggerChannelForAllRUBRatesPrv = Channel<String>()
-    private val refreshTriggerForAllRUBRatesPrv = refreshTriggerChannelForAllRUBRatesPrv.receiveAsFlow()
+    private val refreshTriggerForAllRUBRatesPrv =
+        refreshTriggerChannelForAllRUBRatesPrv.receiveAsFlow()
 
     //
 
     val allAssets = refreshTriggerForAllAssets.flatMapLatest { refresh ->
-        repository.getAssets(
-            forceRefresh = refresh == Refresh.FORCE,
-            onFetchSuccess = {
-                //TODO:
-            },
-            onFetchFailed = { error ->
-                viewModelScope.launch {
-                    eventChannel.send(Event.ShowErrorMessage(error))
-                }
-            }
-        )
+        repository.getAssets()
     }.stateIn(viewModelScope, SharingStarted.Lazily, null)
 
     val allUSDRatesAct = refreshTriggerForAllUSDRatesAct.flatMapLatest { time ->
-        repository.getUSDRates(
-            time = time,
-            actual = true,
-            forceRefresh = true,
-            onFetchSuccess = {
-                //TODO:
-            }
-        ) { error ->
-            viewModelScope.launch {
-                eventChannel.send(Event.ShowErrorMessage(error))
-            }
-        }
+        repository.getUSDRates(time, actual = true)
     }.stateIn(viewModelScope, SharingStarted.Lazily, null)
 
     val allUSDRatesPrv = refreshTriggerForAllUSDRatesPrv.flatMapLatest { time ->
-        repository.getUSDRates(
-            time = time,
-            actual = false,
-            forceRefresh = true,
-            onFetchSuccess = {
-                //TODO:
-            }
-        ) { error ->
-            viewModelScope.launch {
-                eventChannel.send(Event.ShowErrorMessage(error))
-            }
-        }
+        repository.getUSDRates(time, actual = false)
     }.stateIn(viewModelScope, SharingStarted.Lazily, null)
 
     val allRUBRatesAct = refreshTriggerForAllRUBRatesAct.flatMapLatest { time ->
-        repository.getRUBRates(
-            time = time,
-            actual = true,
-            forceRefresh = true,
-            onFetchSuccess = {
-                //TODO:
-            }
-        ) { error ->
-            viewModelScope.launch {
-                eventChannel.send(Event.ShowErrorMessage(error))
-            }
-        }
+        repository.getRUBRates(time, actual = true)
     }.stateIn(viewModelScope, SharingStarted.Lazily, null)
 
     val allRUBRatesPrv = refreshTriggerForAllRUBRatesPrv.flatMapLatest { time ->
-        repository.getRUBRates(
-            time = time,
-            actual = false,
-            forceRefresh = true,
-            onFetchSuccess = {
-                //TODO:
-            }
-        ) { error ->
-            viewModelScope.launch {
-                eventChannel.send(Event.ShowErrorMessage(error))
-            }
-        }
+        repository.getRUBRates(time, actual = false)
     }.stateIn(viewModelScope, SharingStarted.Lazily, null)
-
 
     val exactAsset = refreshTriggerForExactAssets.flatMapLatest { pair ->
         repository.getExactAsset(pair)
@@ -129,54 +77,29 @@ class CoinViewModel @Inject constructor(
 
 
     fun onStart() {
-        if (allAssets.value !is UiState.Loading
-            && allUSDRatesAct.value !is UiState.Loading
-            && allRUBRatesAct.value !is UiState.Loading
-        ) {
-            viewModelScope.launch {
-                refreshTriggerChannelForAllAssets.send(Refresh.NORMAL)
-                val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS", Locale.getDefault())
-                val c = Calendar.getInstance()
-                c.time = Calendar.getInstance().time
+        viewModelScope.launch {
+            refreshTriggerChannelForAllAssets.send(Refresh.NORMAL)
+            val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS", Locale.getDefault())
+            val c = Calendar.getInstance()
+            c.time = Calendar.getInstance().time
 
-                refreshTriggerChannelForAllUSDRatesAct.send(
-                    sdf.format(c.time)
-                )
-                refreshTriggerChannelForAllRUBRatesAct.send(
-                    sdf.format(c.time)
-                )
-                c.add(Calendar.DATE, -1)
-                refreshTriggerChannelForAllUSDRatesPrv.send(
-                    sdf.format(c.time)
-                )
-                refreshTriggerChannelForAllRUBRatesPrv.send(
-                    sdf.format(c.time)
-                )
-            }
+            refreshTriggerChannelForAllUSDRatesAct.send(sdf.format(c.time))
+            refreshTriggerChannelForAllRUBRatesAct.send(sdf.format(c.time))
+            c.add(Calendar.DATE, -1)
+            refreshTriggerChannelForAllUSDRatesPrv.send(sdf.format(c.time))
+            refreshTriggerChannelForAllRUBRatesPrv.send(sdf.format(c.time))
         }
     }
 
     fun getExactAsset(searchTool: String, type: SearchType) {
-        if (exactAsset.value !is UiState.Loading) {
-            viewModelScope.launch {
-                refreshTriggerChannelForExactAssets.send(Pair(searchTool, type))
-            }
+        viewModelScope.launch {
+            refreshTriggerChannelForExactAssets.send(Pair(searchTool, type))
         }
     }
 
     fun updateAssets() {
-        if (allAssets.value !is UiState.Loading) {
-            viewModelScope.launch {
-                refreshTriggerChannelForAllAssets.send(Refresh.FORCE)
-            }
+        viewModelScope.launch {
+            refreshTriggerChannelForAllAssets.send(Refresh.FORCE)
         }
-    }
-
-    enum class Refresh {
-        FORCE, NORMAL
-    }
-
-    sealed class Event {
-        data class ShowErrorMessage(val error: Throwable) : Event()
     }
 }

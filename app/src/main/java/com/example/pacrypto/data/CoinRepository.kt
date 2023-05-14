@@ -11,8 +11,6 @@ import com.example.pacrypto.util.UiState
 import com.example.pacrypto.util.asDBType
 import com.example.pacrypto.util.networkBoundResource
 import kotlinx.coroutines.flow.channelFlow
-import retrofit2.HttpException
-import java.io.IOException
 import javax.inject.Inject
 
 private const val TAG = "COIN_REPOSITORY"
@@ -25,11 +23,7 @@ class CoinRepository @Inject constructor(
     private val assetDao = db_asset.assetDao()
     private val rateDao = db_rate.rateDao()
 
-    fun getAssets(
-        forceRefresh: Boolean,
-        onFetchSuccess: () -> Unit,
-        onFetchFailed: (Throwable) -> Unit
-    ) = networkBoundResource(
+    fun getAssets() = networkBoundResource(
         query = {
             assetDao.getAllAssets()
         },
@@ -44,29 +38,12 @@ class CoinRepository @Inject constructor(
                 assetDao.deleteAllAssets()
                 assetDao.insertAssets(assets.asDBType())
             }
-        },
-        shouldFetch = {
-            if (forceRefresh) {
-                true
-            } else {
-                true
-            }
-        },
-        onFetchSuccess = onFetchSuccess,
-        onFetchFailed = { error ->
-            if (error !is HttpException && error !is IOException) {
-                throw error
-            }
-            onFetchFailed(error)
         }
     )
 
     fun getUSDRates(
         time: String,
         actual: Boolean,
-        forceRefresh: Boolean,
-        onFetchSuccess: () -> Unit,
-        onFetchFailed: (Throwable) -> Unit
     ) = networkBoundResource(
         query = {
             if (actual) {
@@ -94,29 +71,12 @@ class CoinRepository @Inject constructor(
                     rateDao.insertUSDRatesPrv(rate.asDBType("usd", "prv"))
                 }
             }
-        },
-        shouldFetch = {
-            if (forceRefresh) {
-                true
-            } else {
-                true
-            }
-        },
-        onFetchSuccess = onFetchSuccess,
-        onFetchFailed = { error ->
-            if (error !is HttpException && error !is IOException) {
-                throw error
-            }
-            onFetchFailed(error)
         }
     )
 
     fun getRUBRates(
         time: String,
         actual: Boolean,
-        forceRefresh: Boolean,
-        onFetchSuccess: () -> Unit,
-        onFetchFailed: (Throwable) -> Unit
     ) = networkBoundResource(
         query = {
             if (actual) {
@@ -144,37 +104,8 @@ class CoinRepository @Inject constructor(
                     rateDao.insertRUBRatesPrv(rate.asDBType("rub", "prv"))
                 }
             }
-        },
-        shouldFetch = {
-            if (forceRefresh) {
-                true
-            } else {
-                true
-            }
-        },
-        onFetchSuccess = onFetchSuccess,
-        onFetchFailed = { error ->
-            if (error !is HttpException && error !is IOException) {
-                throw error
-            }
-            onFetchFailed(error)
         }
     )
-
-    /*
-    fun getAssetsByTicker(
-        ticker: String,
-    ) = networkBoundResource(
-        query = {
-            coinDao.getAssetsByTicker()
-        },
-        fetch = { mutableListOf<DBAsset>() },
-        shouldFetch = {
-            false
-        },
-        saveFetchResult = {}
-    )
-    */
 
     fun getExactAsset(
         pair: Pair<String, SearchType>,

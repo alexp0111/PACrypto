@@ -11,28 +11,32 @@ inline fun <ResultType, RequestType> networkBoundResource(
     crossinline fetch: suspend () -> RequestType,
     crossinline saveFetchResult: suspend (RequestType) -> Unit = { },
     crossinline shouldFetch: (ResultType) -> Boolean = { true },
-    crossinline onFetchSuccess: () -> Unit = { },
-    crossinline onFetchFailed: (Throwable) -> Unit = { }
 ) = channelFlow {
     val data = query().first()
-    Log.d("QWERTY", "POIUY")
+    Log.d("NBR", "1")
+
 
     if (shouldFetch(data)) {
+        Log.d("NBR", "2")
         val loading = launch {
             query().collect { send(UiState.Loading) }
         }
 
         try {
             saveFetchResult(fetch())
-            onFetchSuccess()
+            Log.d("NBR", "3")
             loading.cancel()
+            Log.d("NBR", "4")
             query().collect { send(UiState.Success(it)) }
+            Log.d("NBR", "5")
         } catch (throwable: Throwable) {
-            onFetchFailed(throwable)
             loading.cancel()
-            query().collect { send(UiState.Failure(throwable.localizedMessage)) }
+            Log.d("NBR", "6")
+            query().collect { send(UiState.Failure(it, "Ошибка подключения")) }
+            Log.d("NBR", "7")
         }
     } else {
+        Log.d("NBR", "8")
         query().collect { send(UiState.Success(it)) }
     }
 }

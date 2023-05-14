@@ -1,7 +1,10 @@
 package com.example.pacrypto.util
 
-sealed class UiState<out T> {
-    object Loading: UiState<Nothing>()
-    data class Success<out T>(val data: T): UiState<T>()
-    data class Failure(val error: String?): UiState<Nothing>()
+sealed class UiState<out T>(
+    val data: T? = null,
+    val error: String? = null
+) {
+    object Loading : UiState<Nothing>()
+    class Success<T>(data: T) : UiState<T>(data)
+    class Failure<T>(data: T, error: String?) : UiState<T> (data, error)
 }
