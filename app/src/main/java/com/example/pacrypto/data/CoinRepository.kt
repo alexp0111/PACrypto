@@ -6,7 +6,6 @@ import com.example.pacrypto.api.CoinApi
 import com.example.pacrypto.data.room.assets.AssetDatabase
 import com.example.pacrypto.data.room.assets.DBAsset
 import com.example.pacrypto.data.room.rates.RateDatabase
-import com.example.pacrypto.ui.HomeFragment
 import com.example.pacrypto.util.SearchType
 import com.example.pacrypto.util.UiState
 import com.example.pacrypto.util.asDBType
@@ -64,23 +63,36 @@ class CoinRepository @Inject constructor(
 
     fun getUSDRates(
         time: String,
+        actual: Boolean,
         forceRefresh: Boolean,
         onFetchSuccess: () -> Unit,
         onFetchFailed: (Throwable) -> Unit
     ) = networkBoundResource(
         query = {
-            rateDao.getAllUSDRates()
+            if (actual) {
+                rateDao.getAllUSDRatesAct()
+            } else {
+                rateDao.getAllUSDRatesPrv()
+            }
         },
         fetch = {
             api.getUSDRates(time)
         },
         saveFetchResult = { rate ->
             rate.rates.forEach {
-                Log.d(TAG + "_USD", it.rate.toString())
+                Log.d(
+                    TAG + "_USD",
+                    it.rate.toString() + " | " + it.time + " | " + it.asset_id_quote
+                )
             }
             db_rate.withTransaction {
-                rateDao.deleteAllUSDRates()
-                rateDao.insertUSDRates(rate.asDBType())
+                if (actual) {
+                    rateDao.deleteAllUSDRatesAct()
+                    rateDao.insertUSDRatesAct(rate.asDBType("usd", "act"))
+                } else {
+                    rateDao.deleteAllUSDRatesPrv()
+                    rateDao.insertUSDRatesPrv(rate.asDBType("usd", "prv"))
+                }
             }
         },
         shouldFetch = {
@@ -101,23 +113,36 @@ class CoinRepository @Inject constructor(
 
     fun getRUBRates(
         time: String,
+        actual: Boolean,
         forceRefresh: Boolean,
         onFetchSuccess: () -> Unit,
         onFetchFailed: (Throwable) -> Unit
     ) = networkBoundResource(
         query = {
-            rateDao.getAllRUBRates()
+            if (actual) {
+                rateDao.getAllRUBRatesAct()
+            } else {
+                rateDao.getAllRUBRatesPrv()
+            }
         },
         fetch = {
             api.getRUBRates(time)
         },
         saveFetchResult = { rate ->
             rate.rates.forEach {
-                Log.d(TAG + "_RUB", it.rate.toString())
+                Log.d(
+                    TAG + "_RUB",
+                    it.rate.toString() + " | " + it.time + " | " + it.asset_id_quote
+                )
             }
             db_rate.withTransaction {
-                rateDao.deleteAllRUBRates()
-                rateDao.insertRUBRates(rate.asDBType())
+                if (actual) {
+                    rateDao.deleteAllRUBRatesAct()
+                    rateDao.insertRUBRatesAct(rate.asDBType("rub", "act"))
+                } else {
+                    rateDao.deleteAllRUBRatesPrv()
+                    rateDao.insertRUBRatesPrv(rate.asDBType("rub", "prv"))
+                }
             }
         },
         shouldFetch = {

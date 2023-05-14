@@ -9,22 +9,44 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface RateDao {
 
-    @Query("SELECT * FROM rates WHERE asset_id_base='USD'")
-    fun getAllUSDRates(): Flow<DBListRates>
+    // Actual usd
+    @Query("SELECT * FROM rates WHERE type='usd_act'")
+    fun getAllUSDRatesAct(): Flow<DBListRates>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertUSDRates(rates: DBListRates)
+    suspend fun insertUSDRatesAct(rates: DBListRates)
 
-    @Query("DELETE FROM rates WHERE asset_id_base='USD'")
-    suspend fun deleteAllUSDRates()
+    @Query("DELETE FROM rates WHERE type='usd_act'")
+    suspend fun deleteAllUSDRatesAct()
 
-    @Query("SELECT * FROM rates WHERE asset_id_base='RUB'")
-    fun getAllRUBRates(): Flow<DBListRates>
+    // Previous USD
+    @Query("SELECT * FROM rates WHERE type='usd_prv'")
+    fun getAllUSDRatesPrv(): Flow<DBListRates>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertRUBRates(rates: DBListRates)
+    suspend fun insertUSDRatesPrv(rates: DBListRates)
 
-    @Query("DELETE FROM rates WHERE asset_id_base='RUB'")
-    suspend fun deleteAllRUBRates()
+    @Query("DELETE FROM rates WHERE type='usd_prv'")
+    suspend fun deleteAllUSDRatesPrv()
+
+    // Actual RUB
+    @Query("SELECT * FROM rates WHERE type='rub_act'")
+    fun getAllRUBRatesAct(): Flow<DBListRates>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertRUBRatesAct(rates: DBListRates)
+
+    @Query("DELETE FROM rates WHERE type='rub_act'")
+    suspend fun deleteAllRUBRatesAct()
+
+    // Previous RUB
+    @Query("SELECT * FROM rates WHERE type='rub_prv'")
+    fun getAllRUBRatesPrv(): Flow<DBListRates>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertRUBRatesPrv(rates: DBListRates)
+
+    @Query("DELETE FROM rates WHERE type='rub_prv'")
+    suspend fun deleteAllRUBRatesPrv()
 
 }

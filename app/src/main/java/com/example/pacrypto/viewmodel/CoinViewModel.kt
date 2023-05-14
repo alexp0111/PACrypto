@@ -3,15 +3,12 @@ package com.example.pacrypto.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.pacrypto.data.CoinRepository
-import com.example.pacrypto.ui.HomeFragment
 import com.example.pacrypto.util.SearchType
 import com.example.pacrypto.util.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
@@ -33,11 +30,23 @@ class CoinViewModel @Inject constructor(
     private val refreshTriggerChannelForExactAssets = Channel<Pair<String, SearchType>>()
     private val refreshTriggerForExactAssets = refreshTriggerChannelForExactAssets.receiveAsFlow()
 
-    private val refreshTriggerChannelForAllUSDRates = Channel<String>()
-    private val refreshTriggerForAllUSDRates = refreshTriggerChannelForAllUSDRates.receiveAsFlow()
+    //
 
-    private val refreshTriggerChannelForAllRUBRates = Channel<String>()
-    private val refreshTriggerForAllRUBRates = refreshTriggerChannelForAllRUBRates.receiveAsFlow()
+    private val refreshTriggerChannelForAllUSDRatesAct = Channel<String>()
+    private val refreshTriggerForAllUSDRatesAct = refreshTriggerChannelForAllUSDRatesAct.receiveAsFlow()
+
+    private val refreshTriggerChannelForAllRUBRatesAct = Channel<String>()
+    private val refreshTriggerForAllRUBRatesAct = refreshTriggerChannelForAllRUBRatesAct.receiveAsFlow()
+
+    //
+
+    private val refreshTriggerChannelForAllUSDRatesPrv = Channel<String>()
+    private val refreshTriggerForAllUSDRatesPrv = refreshTriggerChannelForAllUSDRatesPrv.receiveAsFlow()
+
+    private val refreshTriggerChannelForAllRUBRatesPrv = Channel<String>()
+    private val refreshTriggerForAllRUBRatesPrv = refreshTriggerChannelForAllRUBRatesPrv.receiveAsFlow()
+
+    //
 
     val allAssets = refreshTriggerForAllAssets.flatMapLatest { refresh ->
         repository.getAssets(
@@ -53,9 +62,10 @@ class CoinViewModel @Inject constructor(
         )
     }.stateIn(viewModelScope, SharingStarted.Lazily, null)
 
-    val allUSDRates = refreshTriggerForAllUSDRates.flatMapLatest { time ->
+    val allUSDRatesAct = refreshTriggerForAllUSDRatesAct.flatMapLatest { time ->
         repository.getUSDRates(
             time = time,
+            actual = true,
             forceRefresh = true,
             onFetchSuccess = {
                 //TODO:
@@ -67,9 +77,40 @@ class CoinViewModel @Inject constructor(
         }
     }.stateIn(viewModelScope, SharingStarted.Lazily, null)
 
-    val allRUBRates = refreshTriggerForAllRUBRates.flatMapLatest { time ->
+    val allUSDRatesPrv = refreshTriggerForAllUSDRatesPrv.flatMapLatest { time ->
+        repository.getUSDRates(
+            time = time,
+            actual = false,
+            forceRefresh = true,
+            onFetchSuccess = {
+                //TODO:
+            }
+        ) { error ->
+            viewModelScope.launch {
+                eventChannel.send(Event.ShowErrorMessage(error))
+            }
+        }
+    }.stateIn(viewModelScope, SharingStarted.Lazily, null)
+
+    val allRUBRatesAct = refreshTriggerForAllRUBRatesAct.flatMapLatest { time ->
         repository.getRUBRates(
             time = time,
+            actual = true,
+            forceRefresh = true,
+            onFetchSuccess = {
+                //TODO:
+            }
+        ) { error ->
+            viewModelScope.launch {
+                eventChannel.send(Event.ShowErrorMessage(error))
+            }
+        }
+    }.stateIn(viewModelScope, SharingStarted.Lazily, null)
+
+    val allRUBRatesPrv = refreshTriggerForAllRUBRatesPrv.flatMapLatest { time ->
+        repository.getRUBRates(
+            time = time,
+            actual = false,
             forceRefresh = true,
             onFetchSuccess = {
                 //TODO:
@@ -89,16 +130,27 @@ class CoinViewModel @Inject constructor(
 
     fun onStart() {
         if (allAssets.value !is UiState.Loading
-            && allUSDRates.value !is UiState.Loading
-            && allRUBRates.value !is UiState.Loading) {
+            && allUSDRatesAct.value !is UiState.Loading
+            && allRUBRatesAct.value !is UiState.Loading
+        ) {
             viewModelScope.launch {
                 refreshTriggerChannelForAllAssets.send(Refresh.NORMAL)
-                val sdf = SimpleDateFormat("yyy-MM-dd'T'HH:mm:ss.SSS", Locale.getDefault())
-                refreshTriggerChannelForAllUSDRates.send(
-                    sdf.format(Calendar.getInstance().time)
+                val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS", Locale.getDefault())
+                val c = Calendar.getInstance()
+                c.time = Calendar.getInstance().time
+
+                refreshTriggerChannelForAllUSDRatesAct.send(
+                    sdf.format(c.time)
                 )
-                refreshTriggerChannelForAllRUBRates.send(
-                    sdf.format(Calendar.getInstance().time)
+                refreshTriggerChannelForAllRUBRatesAct.send(
+                    sdf.format(c.time)
+                )
+                c.add(Calendar.DATE, -1)
+                refreshTriggerChannelForAllUSDRatesPrv.send(
+                    sdf.format(c.time)
+                )
+                refreshTriggerChannelForAllRUBRatesPrv.send(
+                    sdf.format(c.time)
                 )
             }
         }

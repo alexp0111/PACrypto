@@ -9,9 +9,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -38,8 +36,10 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     private val viewModel: CoinViewModel by viewModels()
 
     private var searchItemList = arrayListOf<SearchItem>()
-    private var ratesUSD = listOf<Rate>()
-    private var ratesRUB = listOf<Rate>()
+    private var ratesUSDAct = listOf<Rate>()
+    private var ratesRUBAct = listOf<Rate>()
+    private var ratesUSDPrv = listOf<Rate>()
+    private var ratesRUBPrv = listOf<Rate>()
 
     private var fragmentHomeBinding: FragmentHomeBinding? = null
     private var currencyPicker = mutableMapOf<ConstraintLayout, TextView>()
@@ -49,10 +49,13 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     private var searchType = SearchType.TICKER
     private var searchRate = SearchRate.USD
 
+    private var loading = 0
+
     private var extendedAdapter = true
 
     val adapterType1 by lazy {
         CurrencyAdapterType1(
+            requireContext(),
             onItemClicked = { pos, item ->
                 Toast.makeText(context, item.toString(), Toast.LENGTH_SHORT).show()
             }
@@ -85,11 +88,11 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
             PickerAnimator {
                 if (it == "$") {
                     searchRate = SearchRate.USD
-                    searchItemList.addRates(ratesUSD)
+                    searchItemList.addRates(ratesUSDAct)
                     adapterType1.setRateMarker("$")
                 } else {
                     searchRate = SearchRate.RUB
-                    searchItemList.addRates(ratesRUB)
+                    searchItemList.addRates(ratesRUBAct)
                     adapterType1.setRateMarker("₽")
                 }
                 viewModel.getExactAsset(etSearch.text.toString(), searchType)
@@ -235,106 +238,158 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     private fun observers(binding: FragmentHomeBinding) {
         // All assets
         viewLifecycleOwner.lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.allAssets.collect {
-                    val result = it ?: return@collect
+            viewModel.allAssets.collect {
+                val result = it ?: return@collect
 
-                    if (result is UiState.Loading) {
-                        binding.etSearch.hint = "Обновляем данные"
-                        binding.etSearch.isEnabled = false
-                    }
+                if (result is UiState.Loading) {
+                    binding.etSearch.hint = "Обновляем данные"
+                    binding.etSearch.isEnabled = false
+                }
 
-                    if (result is UiState.Success) {
+                if (result is UiState.Success) {
+                    loading++
+                    if (loading == 5) {
                         binding.etSearch.hint = "Найти..."
                         binding.etSearch.isEnabled = true
-                    } else if (result is UiState.Failure) {
-                        binding.etSearch.hint = result.error.toString()
-                        binding.etSearch.isEnabled = true
                     }
+                } else if (result is UiState.Failure) {
+                    binding.etSearch.hint = result.error.toString()
+                    binding.etSearch.isEnabled = true
                 }
             }
         }
 
-        // Rates in USD
+        // Rates in USD (Actual)
         viewLifecycleOwner.lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.allUSDRates.collect {
-                    val result = it ?: return@collect
+            viewModel.allUSDRatesAct.collect {
+                val result = it ?: return@collect
 
-                    if (result is UiState.Loading) {
-                        binding.etSearch.hint = "Обновляем данные"
-                        binding.etSearch.isEnabled = false
-                    }
+                if (result is UiState.Loading) {
+                    binding.etSearch.hint = "Обновляем данные"
+                    binding.etSearch.isEnabled = false
+                }
 
-                    if (result is UiState.Success) {
+                if (result is UiState.Success) {
+                    ratesUSDAct = result.data.rates
+                    loading++
+                    if (loading == 5) {
                         binding.etSearch.hint = "Найти..."
                         binding.etSearch.isEnabled = true
-                        ratesUSD = result.data.rates
-                    } else if (result is UiState.Failure) {
-                        binding.etSearch.hint = result.error.toString()
-                        binding.etSearch.isEnabled = true
                     }
+                } else if (result is UiState.Failure) {
+                    binding.etSearch.hint = result.error.toString()
+                    binding.etSearch.isEnabled = true
                 }
             }
         }
 
-        // rates in RUB
+        // Rates in USD (Previous)
         viewLifecycleOwner.lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.allRUBRates.collect {
-                    val result = it ?: return@collect
+            viewModel.allUSDRatesPrv.collect {
+                val result = it ?: return@collect
 
-                    if (result is UiState.Loading) {
-                        binding.etSearch.hint = "Обновляем данные"
-                        binding.etSearch.isEnabled = false
-                    }
+                if (result is UiState.Loading) {
+                    binding.etSearch.hint = "Обновляем данные"
+                    binding.etSearch.isEnabled = false
+                }
 
-                    if (result is UiState.Success) {
+                if (result is UiState.Success) {
+                    ratesUSDPrv = result.data.rates
+                    loading++
+                    if (loading == 5) {
                         binding.etSearch.hint = "Найти..."
                         binding.etSearch.isEnabled = true
-                        ratesRUB = result.data.rates
-                    } else if (result is UiState.Failure) {
-                        binding.etSearch.hint = result.error.toString()
+                    }
+                } else if (result is UiState.Failure) {
+                    binding.etSearch.hint = result.error.toString()
+                    binding.etSearch.isEnabled = true
+                }
+            }
+        }
+
+        // rates in RUB (Actual)
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.allRUBRatesAct.collect {
+                val result = it ?: return@collect
+
+                if (result is UiState.Loading) {
+                    binding.etSearch.hint = "Обновляем данные"
+                    binding.etSearch.isEnabled = false
+                }
+
+                if (result is UiState.Success) {
+                    ratesRUBAct = result.data.rates
+                    loading++
+                    if (loading == 5) {
+                        binding.etSearch.hint = "Найти..."
                         binding.etSearch.isEnabled = true
                     }
+                } else if (result is UiState.Failure) {
+                    binding.etSearch.hint = result.error.toString()
+                    binding.etSearch.isEnabled = true
+                }
+            }
+        }
+
+        // rates in RUB (Previous)
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.allRUBRatesPrv.collect {
+                val result = it ?: return@collect
+
+                if (result is UiState.Loading) {
+                    binding.etSearch.hint = "Обновляем данные"
+                    binding.etSearch.isEnabled = false
+                }
+
+                if (result is UiState.Success) {
+                    ratesRUBPrv = result.data.rates
+
+                    loading++
+                    if (loading == 5) {
+                        binding.etSearch.hint = "Найти..."
+                        binding.etSearch.isEnabled = true
+                    }
+                } else if (result is UiState.Failure) {
+                    binding.etSearch.hint = result.error.toString()
+                    binding.etSearch.isEnabled = true
                 }
             }
         }
 
         // Search results
         viewLifecycleOwner.lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.exactAsset.collect {
-                    val result = it ?: return@collect
+            viewModel.exactAsset.collect {
+                val result = it ?: return@collect
 
-                    if (result is UiState.Success) {
-                        searchItemList.addAssets(result.data)
-                        if (searchRate == SearchRate.USD) {
-                            searchItemList.addRates(ratesUSD)
-                            adapterType1.setRateMarker("$")
-                        } else {
-                            searchItemList.addRates(ratesRUB)
-                            adapterType1.setRateMarker("₽")
-                        }
-                        adapterType1.updateList(searchItemList)
-                    } else if (result is UiState.Failure) {
-                        // error msg
+                if (result is UiState.Success) {
+                    searchItemList.addAssets(result.data)
+                    if (searchRate == SearchRate.USD) {
+                        searchItemList.addRates(ratesUSDAct)
+                        searchItemList.calcPercents(ratesUSDAct, ratesUSDPrv)
+                        adapterType1.setRateMarker("$")
+                    } else {
+                        searchItemList.addRates(ratesRUBAct)
+                        searchItemList.calcPercents(ratesRUBAct, ratesRUBPrv)
+                        adapterType1.setRateMarker("₽")
                     }
+                    adapterType1.updateList(searchItemList)
+                } else if (result is UiState.Failure) {
+                    // error msg
                 }
             }
         }
     }
 
     private fun swapAdapter(binding: FragmentHomeBinding) {
-        if (extendedAdapter) {
-            binding.rv.adapter = adapterType2
-            //adapterType2.updateList(getTestList())
-            extendedAdapter = false
-        } else {
-            binding.rv.adapter = adapterType1
-            //adapterType1.updateList(getTestList())
-            extendedAdapter = true
-        }
+        // if (extendedAdapter) {
+        //     //binding.rv.adapter = adapterType2
+        //     //adapterType2.updateList(getTestList())
+        //     extendedAdapter = false
+        // } else {
+        //     binding.rv.adapter = adapterType1
+        //     //adapterType1.updateList(getTestList())
+        //     extendedAdapter = true
+        // }
     }
 
     override fun onDestroy() {

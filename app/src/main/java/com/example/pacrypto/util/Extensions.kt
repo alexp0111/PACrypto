@@ -6,6 +6,7 @@ import com.example.pacrypto.data.api_data.ApiListRates
 import com.example.pacrypto.data.room.assets.DBAsset
 import com.example.pacrypto.data.room.rates.DBListRates
 import com.example.pacrypto.data.room.rates.Rate
+import kotlin.math.abs
 
 fun List<ApiAsset>.asDBType(): List<DBAsset> {
     val dBList = mutableListOf<DBAsset>()
@@ -27,8 +28,9 @@ fun List<ApiAsset>.asDBType(): List<DBAsset> {
     return dBList
 }
 
-fun ApiListRates.asDBType(): DBListRates {
+fun ApiListRates.asDBType(rate: String, type: String): DBListRates {
     return DBListRates(
+        type = rate + "_" + type,
         asset_id_base = this.asset_id_base,
         rates = this.rates
     )
@@ -60,5 +62,22 @@ fun MutableList<SearchItem>.addRates(rates: List<Rate>) {
         val rate = (rates as ArrayList<Rate>).findRateFor(it.ticker)
         it.rateCurrent = rate?.rate
         it.timeUpdate = rate?.time
+    }
+}
+
+fun MutableList<SearchItem>.calcPercents(ratesUSDAct: List<Rate>, ratesUSDPrv: List<Rate>) {
+    this.forEach {
+        val rate1 = (ratesUSDAct as ArrayList<Rate>).findRateFor(it.ticker)
+        val rate2 = (ratesUSDPrv as ArrayList<Rate>).findRateFor(it.ticker)
+        if (rate1 == null || rate2 == null) {
+            it.percents = null
+        } else {
+            val percents = ((1.0 / rate1.rate) / (1.0 / rate2.rate)) * 100.0 - 100.0
+            if (percents >= 0.0) {
+                it.percents = "+" + String.format("%.2f", abs(percents)) + "%"
+            } else {
+                it.percents = "-" + String.format("%.2f", abs(percents)) + "%"
+            }
+        }
     }
 }

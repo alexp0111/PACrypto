@@ -5,6 +5,7 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "rates")
 data class DBListRates(
-    @PrimaryKey val asset_id_base: String,
+    @PrimaryKey val type: String,
+    val asset_id_base: String,
     val rates: List<Rate>
 )

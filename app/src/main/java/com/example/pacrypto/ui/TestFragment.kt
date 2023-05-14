@@ -34,7 +34,7 @@ class TestFragment : Fragment(R.layout.fragment_test) {
 
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.allUSDRates.collect {
+                viewModel.allUSDRatesAct.collect {
                     val result = it ?: return@collect
 
 

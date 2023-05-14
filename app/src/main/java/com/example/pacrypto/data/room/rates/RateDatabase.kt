@@ -5,7 +5,7 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.example.pacrypto.data.room.Converters
 
-@Database(entities = [DBListRates::class], version = 3)
+@Database(entities = [DBListRates::class], version = 4)
 @TypeConverters(Converters::class)
 abstract class RateDatabase : RoomDatabase() {
 
