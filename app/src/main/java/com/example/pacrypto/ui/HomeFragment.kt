@@ -2,7 +2,6 @@ package com.example.pacrypto.ui
 
 import android.content.pm.ActivityInfo
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.TextView
 import android.widget.Toast
@@ -143,6 +142,13 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         }
 
 
+        // fab
+        binding.fabRefresh.setOnClickListener {
+            loading = 0
+            viewModel.refreshAllData()
+        }
+
+
         // Adapter
         val manager = LinearLayoutManager(context)
         manager.orientation = LinearLayoutManager.VERTICAL
@@ -220,7 +226,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
     override fun onStart() {
         super.onStart()
-        viewModel.onStart()
+        viewModel.refreshAllData()
     }
 
     private fun observers(binding: FragmentHomeBinding) {
@@ -365,21 +371,31 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     }
 
     private fun showLoadingInfo(binding: FragmentHomeBinding) {
-        binding.etSearch.hint = "Обновляем данные"
+        if (binding.etSearch.text.isNullOrEmpty()) {
+            binding.etSearch.hint = "Обновляем данные"
+        }
         binding.etSearch.isEnabled = false
+        binding.fabRefresh.isEnabled = false
+        binding.pb.visibility = View.VISIBLE
     }
 
     private fun showSuccessInfo(binding: FragmentHomeBinding) {
-        binding.etSearch.hint = "Найти..."
+        if (binding.etSearch.text.isNullOrEmpty()) {
+            binding.etSearch.hint = "Найти..."
+        }
         binding.etSearch.isEnabled = true
+        binding.fabRefresh.isEnabled = true
+        binding.pb.visibility = View.GONE
     }
 
     private fun showFailureInfo(binding: FragmentHomeBinding) {
-
-        Log.d(TAG + " Loading", "+")
-
-        binding.etSearch.hint = "Найти..."
+        if (binding.etSearch.text.isNullOrEmpty()) {
+            binding.etSearch.hint = "Найти..."
+        }
         binding.etSearch.isEnabled = true
+        binding.fabRefresh.isEnabled = true
+
+        binding.pb.visibility = View.GONE
 
         Toast.makeText(
             requireContext(),

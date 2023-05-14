@@ -76,7 +76,7 @@ class CoinViewModel @Inject constructor(
     }.stateIn(viewModelScope, SharingStarted.Lazily, null)
 
 
-    fun onStart() {
+    fun refreshAllData() {
         viewModelScope.launch {
             refreshTriggerChannelForAllAssets.send(Refresh.NORMAL)
             val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS", Locale.getDefault())

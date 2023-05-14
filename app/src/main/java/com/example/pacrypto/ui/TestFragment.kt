@@ -77,7 +77,7 @@ class TestFragment : Fragment(R.layout.fragment_test) {
 
     override fun onStart() {
         super.onStart()
-        viewModel.onStart()
+        viewModel.refreshAllData()
     }
 
     override fun onDestroy() {

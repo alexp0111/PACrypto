@@ -17,12 +17,12 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
-            android:visibility="visible"
             android:id="@+id/iv_qr"
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:layout_margin="@dimen/basic_margin"
             android:src="@drawable/ic_qr"
+            android:visibility="visible"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/ll_search"
             app:layout_constraintStart_toStartOf="parent"
@@ -31,70 +31,86 @@
         <TextView
             android:id="@+id/tv_name"
             style="@style/TextMid"
-            android:gravity="center"
-            android:visibility="gone"
-            android:textColor="@color/picker_text_off"
-            android:textSize="13sp"
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:layout_margin="@dimen/basic_margin"
+            android:gravity="center"
             android:text="NA\nME"
+            android:textColor="@color/picker_text_off"
+            android:textSize="13sp"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/ll_search"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <LinearLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/ll_search"
             android:layout_width="0dp"
             android:layout_height="36dp"
             android:background="@drawable/search_background"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/iv_sub"
             app:layout_constraintStart_toEndOf="@+id/iv_qr"
             app:layout_constraintTop_toTopOf="parent">
 
             <ImageView
+                android:id="@+id/iv_search"
                 android:layout_width="20dp"
                 android:layout_height="20dp"
                 android:layout_gravity="center"
                 android:layout_marginStart="@dimen/half_basic_margin"
-                android:src="@drawable/ic_search" />
+                android:src="@drawable/ic_search"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <EditText
                 android:id="@+id/et_search"
                 style="@style/TextAcc"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="32dp"
-                android:layout_marginStart="@dimen/half_basic_margin"
-                android:layout_marginEnd="@dimen/basic_margin"
+                android:layout_marginHorizontal="@dimen/half_basic_margin"
                 android:background="@null"
                 android:gravity="center_vertical"
                 android:hint="Найти..."
-                android:inputType="text"
                 android:imeOptions="actionDone"
+                android:inputType="text"
                 android:lines="1"
                 android:maxLines="1"
                 android:scrollHorizontally="true"
                 android:textColor="@color/gray_900"
                 android:textColorHint="@color/gray_400"
-                android:textCursorDrawable="@drawable/color_cursor_2" />
+                android:textCursorDrawable="@drawable/color_cursor_2"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/pb"
+                app:layout_constraintStart_toEndOf="@id/iv_search"
+                app:layout_constraintTop_toTopOf="parent" />
 
-        </LinearLayout>
+            <ProgressBar
+                android:id="@+id/pb"
+                android:visibility="gone"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginEnd="@dimen/half_basic_margin"
+                android:indeterminateTint="@color/black"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <TextView
             android:id="@+id/tv_ticker"
             style="@style/TextMid"
-            android:visibility="gone"
-            android:gravity="center"
-            android:textColor="@color/picker_text_on"
-            android:textSize="13sp"
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:layout_margin="@dimen/basic_margin"
+            android:gravity="center"
             android:text="TIC\nKER"
+            android:textColor="@color/picker_text_on"
+            android:textSize="13sp"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/ll_search"
@@ -104,9 +120,9 @@
             android:id="@+id/iv_sub"
             android:layout_width="32dp"
             android:layout_height="32dp"
-            android:visibility="visible"
             android:layout_margin="@dimen/basic_margin"
             android:src="@drawable/ic_ring"
+            android:visibility="visible"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/ll_search"
@@ -214,15 +230,15 @@
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_refresh"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:src="@drawable/ic_refresh"
-        app:elevation="@dimen/card_elevation"
-        android:visibility="gone"
-        app:borderWidth="0dp"
-        android:backgroundTint="@color/purple_300"
         android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_margin="@dimen/basic_margin"
-        android:layout_height="wrap_content" />
+        android:backgroundTint="@color/purple_300"
+        android:src="@drawable/ic_refresh"
+        android:visibility="visible"
+        app:borderWidth="0dp"
+        app:elevation="@dimen/card_elevation"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
