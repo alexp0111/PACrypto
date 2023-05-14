@@ -2,8 +2,10 @@ package com.example.pacrypto.api
 
 import com.example.pacrypto.data.api_data.ApiAsset
 import com.example.pacrypto.data.api_data.ApiListRates
+import com.example.pacrypto.data.api_data.ApiOhlcv
 import retrofit2.http.GET
 import retrofit2.http.Headers
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface CoinApi {
@@ -29,4 +31,19 @@ interface CoinApi {
     suspend fun getRUBRates(
         @Query("time") time: String
     ): ApiListRates
+
+    @Headers("X-CoinAPI-Key: $API_KEY")
+    @GET("ohlcv/{symbol_id}/latest")
+    suspend fun getOhlcvs(
+        @Path("symbol_id") id: String,
+        @Query("period_id") period_id: String,
+        @Query("limit") limit: Int,
+    ): List<ApiOhlcv>
+
+    @Headers("X-CoinAPI-Key: $API_KEY")
+    @GET("ohlcv/{symbol_id}/latest")
+    suspend fun getOhlcvs(
+        @Path("symbol_id") id: String,
+        @Query("period_id") period_id: String,
+    ): List<ApiOhlcv>
 }

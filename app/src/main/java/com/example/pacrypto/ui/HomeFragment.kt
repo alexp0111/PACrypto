@@ -53,13 +53,18 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
     private var loading = 0
 
-    private var extendedAdapter = true
-
     val adapterType1 by lazy {
         CoinAdapter(
             requireContext(),
             onItemClicked = { pos, item ->
-                Toast.makeText(context, item.toString(), Toast.LENGTH_SHORT).show()
+                val fragment = InfoFragment()
+                val bundle = Bundle()
+                bundle.putString("ticker", item.ticker)
+                bundle.putString("name", item.name)
+                fragment.arguments = bundle
+
+                parentFragmentManager.beginTransaction().addToBackStack(null)
+                    .replace(R.id.container_main, fragment).commit()
             }
         )
     }

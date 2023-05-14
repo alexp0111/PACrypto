@@ -1,4 +1,4 @@
-package com.example.pacrypto.data.room
+package com.example.pacrypto.data.room.rates
 
 import androidx.room.TypeConverter
 import com.example.pacrypto.data.room.rates.Rate
@@ -8,7 +8,7 @@ import com.google.gson.reflect.TypeToken
 import java.lang.reflect.Type
 
 
-class Converters {
+class RateConverters {
     @TypeConverter
     fun jsonToList(value: String?): List<Rate> {
         val listType: Type = object : TypeToken<List<Rate?>?>() {}.type

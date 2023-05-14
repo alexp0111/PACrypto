@@ -2,40 +2,63 @@ package com.example.pacrypto.ui
 
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.TextView
 import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
-import com.example.pacrypto.animator.PickerAnimator
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.example.pacrypto.R
+import com.example.pacrypto.animator.PickerAnimator
 import com.example.pacrypto.databinding.FragmentInfoBinding
+import com.example.pacrypto.util.*
+import com.example.pacrypto.viewmodel.OhlcvsViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 private const val TAG = "INFO_FRAGMENT"
 
 @AndroidEntryPoint
 class InfoFragment : Fragment(R.layout.fragment_info) {
 
+    private val viewModel: OhlcvsViewModel by viewModels()
 
     private var fragmentInfoBinding: FragmentInfoBinding? = null
     private var currencyPicker = mutableMapOf<ConstraintLayout, TextView>()
     private var datePicker = mutableMapOf<ConstraintLayout, TextView>()
+
+    private var name: String = ""
+    private var ticker: String = ""
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val binding = FragmentInfoBinding.bind(view)
         fragmentInfoBinding = binding
 
+        //set up observers
+        observers(binding)
+
+        // Arguments
+        name = arguments?.getString("name") ?: ""
+        ticker = arguments?.getString("ticker") ?: ""
+
+
+        // Picker rate
         binding.apply {
             currencyPicker[currencyPicker1] = currencyPickerText1
             currencyPicker[currencyPicker2] = currencyPickerText2
+
+            PickerAnimator {
+                Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
+            }.animate(resources, context, currencyPicker, pickerCurrencyCircle)
         }
 
-        PickerAnimator {
-            Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
-        }.animate(resources, context, currencyPicker, binding.pickerCurrencyCircle)
 
+        // Picker date
         binding.apply {
             datePicker[picker1] = pickerText1
             datePicker[picker2] = pickerText2
@@ -43,11 +66,11 @@ class InfoFragment : Fragment(R.layout.fragment_info) {
             datePicker[picker4] = pickerText4
             datePicker[picker5] = pickerText5
             datePicker[picker6] = pickerText6
-        }
 
-        PickerAnimator {
-            binding.lineChart.animate(lineSet)
-        }.animate(resources, context, datePicker, binding.pickerCircle)
+            PickerAnimator {
+                binding.lineChart.animate(lineSet)
+            }.animate(resources, context, datePicker, pickerCircle)
+        }
 
         binding.apply {
             ivBack.setOnClickListener {
@@ -65,6 +88,34 @@ class InfoFragment : Fragment(R.layout.fragment_info) {
                         .toString()
             }
             lineChart.animate(lineSet)
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        viewModel.getExactOhlcvs(ticker, "USD")
+    }
+
+    private fun observers(binding: FragmentInfoBinding) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.ohlcvs.collect {
+                    when (it) {
+                        is UiState.Loading -> {}
+                        is UiState.Success -> {
+                            if (it.data != null) {
+                                it.data.periods.forEach { extList ->
+                                    Log.d(TAG, extList.size.toString())
+                                }
+                            }
+                        }
+                        is UiState.Failure -> {
+                            Toast.makeText(requireContext(), "Error", Toast.LENGTH_SHORT).show()
+                        }
+                        else -> {}
+                    }
+                }
+            }
         }
     }
 

@@ -3,8 +3,11 @@ package com.example.pacrypto.data
 import android.util.Log
 import androidx.room.withTransaction
 import com.example.pacrypto.api.CoinApi
+import com.example.pacrypto.data.api_data.ApiOhlcv
 import com.example.pacrypto.data.room.assets.AssetDatabase
 import com.example.pacrypto.data.room.assets.DBAsset
+import com.example.pacrypto.data.room.ohlcvs.DBOhlcvs
+import com.example.pacrypto.data.room.ohlcvs.OhlcvsDatabase
 import com.example.pacrypto.data.room.rates.RateDatabase
 import com.example.pacrypto.util.SearchType
 import com.example.pacrypto.util.UiState
@@ -18,10 +21,12 @@ private const val TAG = "COIN_REPOSITORY"
 class CoinRepository @Inject constructor(
     private val api: CoinApi,
     private val db_asset: AssetDatabase,
-    private val db_rate: RateDatabase
+    private val db_rate: RateDatabase,
+    private val db_ohlcvs: OhlcvsDatabase,
 ) {
     private val assetDao = db_asset.assetDao()
     private val rateDao = db_rate.rateDao()
+    private val ohlcvsDao = db_ohlcvs.ohlcvsDao()
 
     fun getAssets() = networkBoundResource(
         query = {
@@ -106,6 +111,44 @@ class CoinRepository @Inject constructor(
             }
         }
     )
+
+
+    fun getOhlcv(
+        id: String,
+    ) = networkBoundResource(
+        query = {
+            ohlcvsDao.getOhlcvs(id)
+        },
+        fetch = {
+            val ohlcvsDay = api.getOhlcvs(id, "1HRS", 24)
+            Log.d(TAG + "_1", System.currentTimeMillis().toString())
+            val ohlcvsWeek = api.getOhlcvs(id, "1DAY", 7)
+            Log.d(TAG + "_2", System.currentTimeMillis().toString())
+            val ohlcvsMonth = api.getOhlcvs(id, "1DAY", 30)
+            Log.d(TAG + "_3", System.currentTimeMillis().toString())
+            val ohlcvsQuarter = api.getOhlcvs(id, "1DAY", 90)
+            Log.d(TAG + "_4", System.currentTimeMillis().toString())
+            val ohlcvsYear = api.getOhlcvs(id, "1MTH", 12)
+            Log.d(TAG + "_5", System.currentTimeMillis().toString())
+            val ohlcvsAll = api.getOhlcvs(id, "1MTH")
+
+            return@networkBoundResource listOf(
+                ohlcvsDay,
+                ohlcvsWeek,
+                ohlcvsMonth,
+                ohlcvsQuarter,
+                ohlcvsYear,
+                ohlcvsAll
+            )
+        },
+        saveFetchResult = { ohlcvs ->
+            db_ohlcvs.withTransaction {
+                ohlcvsDao.deleteOhlcvs(id)
+                ohlcvsDao.insertOhlcvs(ohlcvs.asDBType(id))
+            }
+        }
+    )
+
 
     fun getExactAsset(
         pair: Pair<String, SearchType>,
