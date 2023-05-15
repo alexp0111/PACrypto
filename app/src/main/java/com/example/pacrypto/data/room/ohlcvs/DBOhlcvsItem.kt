@@ -11,4 +11,15 @@ data class DBOhlcvsItem(
     val time_period_start: String,
     val trades_count: Int,
     val volume_traded: Double
-)
+) {
+    fun asDoubleList(): List<Double> {
+        return listOf(
+            price_open,
+            price_high,
+            price_low,
+            price_close,
+            volume_traded,
+            trades_count.toDouble()
+        )
+    }
+}

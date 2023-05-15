@@ -17,7 +17,7 @@
             android:layout_height="match_parent">
 
             <TextView
-                android:id="@+id/tv_ticker"
+                android:id="@+id/tv_param"
                 style="@style/TextMid"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -31,12 +31,21 @@
             <TextView
                 android:id="@+id/tv_value"
                 style="@style/TextHeader"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/basic_margin"
+                android:ellipsize="marquee"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:gravity="end"
+                android:marqueeRepeatLimit="marquee_forever"
+                android:maxLines="1"
+                android:scrollHorizontally="true"
+                android:singleLine="true"
                 android:text="285.4$"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/tv_param"
                 app:layout_constraintTop_toTopOf="parent" />
 
 

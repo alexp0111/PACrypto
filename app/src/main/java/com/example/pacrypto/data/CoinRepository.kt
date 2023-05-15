@@ -3,10 +3,8 @@ package com.example.pacrypto.data
 import android.util.Log
 import androidx.room.withTransaction
 import com.example.pacrypto.api.CoinApi
-import com.example.pacrypto.data.api_data.ApiOhlcv
 import com.example.pacrypto.data.room.assets.AssetDatabase
 import com.example.pacrypto.data.room.assets.DBAsset
-import com.example.pacrypto.data.room.ohlcvs.DBOhlcvs
 import com.example.pacrypto.data.room.ohlcvs.OhlcvsDatabase
 import com.example.pacrypto.data.room.rates.RateDatabase
 import com.example.pacrypto.util.SearchType
@@ -115,6 +113,7 @@ class CoinRepository @Inject constructor(
 
     fun getOhlcv(
         id: String,
+        shouldFetch: Boolean
     ) = networkBoundResource(
         query = {
             ohlcvsDao.getOhlcvs(id)
@@ -146,7 +145,8 @@ class CoinRepository @Inject constructor(
                 ohlcvsDao.deleteOhlcvs(id)
                 ohlcvsDao.insertOhlcvs(ohlcvs.asDBType(id))
             }
-        }
+        },
+        shouldFetch = { shouldFetch }
     )
 
 

@@ -4,6 +4,7 @@ import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.view.View.OnTouchListener
 import android.widget.TextView
 import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -12,8 +13,10 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.db.williamchart.ExperimentalFeature
 import com.example.pacrypto.R
+import com.example.pacrypto.adapters.InfoAdapter
 import com.example.pacrypto.animator.PickerAnimator
 import com.example.pacrypto.data.room.ohlcvs.DBOhlcvsItem
 import com.example.pacrypto.databinding.FragmentInfoBinding
@@ -21,7 +24,7 @@ import com.example.pacrypto.util.UiState
 import com.example.pacrypto.viewmodel.OhlcvsViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import java.util.Collections
+
 
 private const val TAG = "INFO_FRAGMENT"
 
@@ -30,6 +33,7 @@ class InfoFragment : Fragment(R.layout.fragment_info) {
 
     private val viewModel: OhlcvsViewModel by viewModels()
     private var dataList: List<List<DBOhlcvsItem>>? = null
+    private var infoList: List<DBOhlcvsItem>? = null
 
     private var fragmentInfoBinding: FragmentInfoBinding? = null
     private var currencyPicker = mutableMapOf<ConstraintLayout, TextView>()
@@ -37,7 +41,12 @@ class InfoFragment : Fragment(R.layout.fragment_info) {
 
     private var name: String = ""
     private var ticker: String = ""
+
     private var currency: String = "$"
+
+    val adapter by lazy {
+        InfoAdapter(requireContext())
+    }
 
     @OptIn(ExperimentalFeature::class)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -61,11 +70,10 @@ class InfoFragment : Fragment(R.layout.fragment_info) {
 
             PickerAnimator {
                 if (it == "$") {
-                    viewModel.getExactOhlcvs(ticker, "USD")
+                    viewModel.getExactOhlcvs(ticker, "USD", false)
                 } else {
-                    viewModel.getExactOhlcvs(ticker, "RUB")
+                    viewModel.getExactOhlcvs(ticker, "RUB", false)
                 }
-                currency = it
             }.animate(resources, context, currencyPicker, pickerCurrencyCircle)
         }
 
@@ -81,16 +89,20 @@ class InfoFragment : Fragment(R.layout.fragment_info) {
 
             PickerAnimator {
                 if (dataList != null) {
-                    val currentList = when (it) {
-                        "24h" -> dataList!![0].asPairedList()
-                        "7d" -> dataList!![1].asPairedList()
-                        "1m" -> dataList!![2].asPairedList()
-                        "3m" -> dataList!![3].asPairedList()
-                        "1y" -> dataList!![4].asPairedList()
-                        "All" -> dataList!![5].asPairedList()
-                        else -> dataList!![0].asPairedList()
+                    val i = when (it) {
+                        "24h" -> 0
+                        "7d" -> 1
+                        "1m" -> 2
+                        "3m" -> 3
+                        "1y" -> 4
+                        "All" -> 5
+                        else -> 0
                     }
+
+                    val currentList = dataList!![i].asPairedList()
                     binding.lineChart.animate(currentList.asReversed())
+                    adapter.updateList(infoList!![i].asDoubleList(), currency)
+
                     lineChart.onDataPointTouchListener = { index, _, _ ->
                         val item = currentList.asReversed().toList()[index]
                         lineChartValue.text = buildString {
@@ -125,6 +137,20 @@ class InfoFragment : Fragment(R.layout.fragment_info) {
                 )
             lineChart.animation.duration = animationDuration
         }
+
+
+        // recycler
+        val manager = LinearLayoutManager(context)
+        manager.orientation = LinearLayoutManager.VERTICAL
+        binding.rv.layoutManager = manager
+        binding.rv.adapter = adapter
+        binding.rv.isNestedScrollingEnabled = false
+
+        binding.svMain.isVerticalScrollBarEnabled = false
+
+        binding.ivFavFalse.setOnClickListener {
+            binding.svMain.setOnTouchListener { _, _ -> false }
+        }
     }
 
     override fun onStart() {
@@ -144,20 +170,26 @@ class InfoFragment : Fragment(R.layout.fragment_info) {
                         is UiState.Success -> {
                             if (it.data != null) {
                                 dataList = it.data.periods
+                                infoList = getInfo(it.data.periods)
                                 binding.lineChart.visibility = View.VISIBLE
                                 binding.picker1.performClick()
+                                currency = if (it.data.type.endsWith("USD")) "$" else "₽"
+                                adapter.updateList(infoList!![0].asDoubleList(), currency)
                             }
                             binding.pb.visibility = View.GONE
                         }
                         is UiState.Failure -> {
                             if (it.data != null) {
                                 dataList = it.data.periods
+                                infoList = getInfo(it.data.periods)
                                 binding.lineChart.visibility = View.VISIBLE
                                 binding.picker1.performClick()
+                                currency = if (it.data.type.endsWith("USD")) "$" else "₽"
+                                adapter.updateList(infoList!![0].asDoubleList(), currency)
                             }
                             Toast.makeText(
                                 requireContext(),
-                                "Сохраненные данные",
+                                "Не удалось загрузить данные",
                                 Toast.LENGTH_SHORT
                             ).show()
                             binding.pb.visibility = View.GONE
@@ -171,6 +203,27 @@ class InfoFragment : Fragment(R.layout.fragment_info) {
                 }
             }
         }
+    }
+
+    private fun getInfo(dataList: List<List<DBOhlcvsItem>>): List<DBOhlcvsItem> {
+        val list = mutableListOf<DBOhlcvsItem>()
+        dataList.forEach { extList ->
+            list.add(
+                DBOhlcvsItem(
+                    price_close = extList.first().price_close,
+                    price_high = extList.maxWith(Comparator.comparingDouble { it.price_high }).price_high,
+                    price_low = extList.minWith(Comparator.comparingDouble { it.price_low }).price_low,
+                    price_open = extList.last().price_open,
+                    time_close = extList.first().time_close,
+                    time_open = extList.last().time_open,
+                    time_period_end = extList.first().time_period_end,
+                    time_period_start = extList.last().time_period_start,
+                    trades_count = extList.sumOf { it.trades_count },
+                    volume_traded = extList.sumOf { it.volume_traded }
+                )
+            )
+        }
+        return list
     }
 
     override fun onDestroy() {

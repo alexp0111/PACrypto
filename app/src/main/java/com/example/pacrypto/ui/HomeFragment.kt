@@ -231,6 +231,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
     override fun onStart() {
         super.onStart()
+        loading = 0
         viewModel.refreshAllData()
     }
 

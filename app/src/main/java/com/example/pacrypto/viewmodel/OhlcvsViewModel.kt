@@ -24,19 +24,25 @@ class OhlcvsViewModel @Inject constructor(
     val repository: CoinRepository
 ) : ViewModel() {
 
-    private val refreshTriggerChannel = Channel<String>()
+    private val refreshTriggerChannel = Channel<Pair<String, Boolean>>()
     private val refreshTrigger = refreshTriggerChannel.receiveAsFlow()
 
     //
 
-    val ohlcvs = refreshTrigger.flatMapLatest { id ->
-        repository.getOhlcv(id)
+    val ohlcvs = refreshTrigger.flatMapLatest { pair ->
+        repository.getOhlcv(pair.first, pair.second)
     }.stateIn(viewModelScope, SharingStarted.Lazily, null)
 
 
     fun getExactOhlcvs(ticker: String, currency: String) {
         viewModelScope.launch {
-            refreshTriggerChannel.send("BITSTAMP_SPOT_" + ticker + "_" + currency)
+            refreshTriggerChannel.send(Pair("BITSTAMP_SPOT_" + ticker + "_" + currency, true))
+        }
+    }
+
+    fun getExactOhlcvs(ticker: String, currency: String, shouldFetch: Boolean) {
+        viewModelScope.launch {
+            refreshTriggerChannel.send(Pair("BITSTAMP_SPOT_" + ticker + "_" + currency, shouldFetch))
         }
     }
 }
