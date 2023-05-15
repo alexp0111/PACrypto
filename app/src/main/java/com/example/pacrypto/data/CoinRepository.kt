@@ -122,13 +122,13 @@ class CoinRepository @Inject constructor(
         fetch = {
             val ohlcvsDay = api.getOhlcvs(id, "1HRS", 24)
             Log.d(TAG + "_1", System.currentTimeMillis().toString())
-            val ohlcvsWeek = api.getOhlcvs(id, "1DAY", 7)
+            val ohlcvsWeek = api.getOhlcvs(id, "2HRS", 84)
             Log.d(TAG + "_2", System.currentTimeMillis().toString())
-            val ohlcvsMonth = api.getOhlcvs(id, "1DAY", 30)
+            val ohlcvsMonth = api.getOhlcvs(id, "8HRS", 90)
             Log.d(TAG + "_3", System.currentTimeMillis().toString())
             val ohlcvsQuarter = api.getOhlcvs(id, "1DAY", 90)
             Log.d(TAG + "_4", System.currentTimeMillis().toString())
-            val ohlcvsYear = api.getOhlcvs(id, "1MTH", 12)
+            val ohlcvsYear = api.getOhlcvs(id, "5DAY", 73)
             Log.d(TAG + "_5", System.currentTimeMillis().toString())
             val ohlcvsAll = api.getOhlcvs(id, "1MTH")
 

@@ -12,13 +12,16 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.db.williamchart.ExperimentalFeature
 import com.example.pacrypto.R
 import com.example.pacrypto.animator.PickerAnimator
+import com.example.pacrypto.data.room.ohlcvs.DBOhlcvsItem
 import com.example.pacrypto.databinding.FragmentInfoBinding
-import com.example.pacrypto.util.*
+import com.example.pacrypto.util.UiState
 import com.example.pacrypto.viewmodel.OhlcvsViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import java.util.Collections
 
 private const val TAG = "INFO_FRAGMENT"
 
@@ -26,6 +29,7 @@ private const val TAG = "INFO_FRAGMENT"
 class InfoFragment : Fragment(R.layout.fragment_info) {
 
     private val viewModel: OhlcvsViewModel by viewModels()
+    private var dataList: List<List<DBOhlcvsItem>>? = null
 
     private var fragmentInfoBinding: FragmentInfoBinding? = null
     private var currencyPicker = mutableMapOf<ConstraintLayout, TextView>()
@@ -33,7 +37,9 @@ class InfoFragment : Fragment(R.layout.fragment_info) {
 
     private var name: String = ""
     private var ticker: String = ""
+    private var currency: String = "$"
 
+    @OptIn(ExperimentalFeature::class)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val binding = FragmentInfoBinding.bind(view)
@@ -46,6 +52,7 @@ class InfoFragment : Fragment(R.layout.fragment_info) {
         name = arguments?.getString("name") ?: ""
         ticker = arguments?.getString("ticker") ?: ""
 
+        binding.tvHeader.text = name
 
         // Picker rate
         binding.apply {
@@ -53,7 +60,12 @@ class InfoFragment : Fragment(R.layout.fragment_info) {
             currencyPicker[currencyPicker2] = currencyPickerText2
 
             PickerAnimator {
-                Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
+                if (it == "$") {
+                    viewModel.getExactOhlcvs(ticker, "USD")
+                } else {
+                    viewModel.getExactOhlcvs(ticker, "RUB")
+                }
+                currency = it
             }.animate(resources, context, currencyPicker, pickerCurrencyCircle)
         }
 
@@ -68,26 +80,50 @@ class InfoFragment : Fragment(R.layout.fragment_info) {
             datePicker[picker6] = pickerText6
 
             PickerAnimator {
-                binding.lineChart.animate(lineSet)
+                if (dataList != null) {
+                    val currentList = when (it) {
+                        "24h" -> dataList!![0].asPairedList()
+                        "7d" -> dataList!![1].asPairedList()
+                        "1m" -> dataList!![2].asPairedList()
+                        "3m" -> dataList!![3].asPairedList()
+                        "1y" -> dataList!![4].asPairedList()
+                        "All" -> dataList!![5].asPairedList()
+                        else -> dataList!![0].asPairedList()
+                    }
+                    binding.lineChart.animate(currentList.asReversed())
+                    lineChart.onDataPointTouchListener = { index, _, _ ->
+                        val item = currentList.asReversed().toList()[index]
+                        lineChartValue.text = buildString {
+                            append(item.first.substring(0, 10))
+                            append("||")
+                            append(item.first.substring(11, 19))
+                            append(": ")
+                            append(item.second)
+                            append(currency)
+                        }
+
+                    }
+                }
             }.animate(resources, context, datePicker, pickerCircle)
         }
 
+
+        // Back button
         binding.apply {
             ivBack.setOnClickListener {
                 parentFragmentManager.popBackStack()
             }
+        }
+
+
+        // chart
+        binding.apply {
             lineChart.gradientFillColors =
                 intArrayOf(
                     resources.getColor(R.color.main_text_color),
                     Color.TRANSPARENT
                 )
             lineChart.animation.duration = animationDuration
-            lineChart.onDataPointTouchListener = { index, _, _ ->
-                lineChartValue.text =
-                    lineSet.toList()[index]
-                        .toString()
-            }
-            lineChart.animate(lineSet)
         }
     }
 
@@ -101,18 +137,36 @@ class InfoFragment : Fragment(R.layout.fragment_info) {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.ohlcvs.collect {
                     when (it) {
-                        is UiState.Loading -> {}
+                        is UiState.Loading -> {
+                            binding.pb.visibility = View.VISIBLE
+                            binding.lineChart.visibility = View.GONE
+                        }
                         is UiState.Success -> {
                             if (it.data != null) {
-                                it.data.periods.forEach { extList ->
-                                    Log.d(TAG, extList.size.toString())
-                                }
+                                dataList = it.data.periods
+                                binding.lineChart.visibility = View.VISIBLE
+                                binding.picker1.performClick()
                             }
+                            binding.pb.visibility = View.GONE
                         }
                         is UiState.Failure -> {
-                            Toast.makeText(requireContext(), "Error", Toast.LENGTH_SHORT).show()
+                            if (it.data != null) {
+                                dataList = it.data.periods
+                                binding.lineChart.visibility = View.VISIBLE
+                                binding.picker1.performClick()
+                            }
+                            Toast.makeText(
+                                requireContext(),
+                                "Сохраненные данные",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            binding.pb.visibility = View.GONE
                         }
-                        else -> {}
+                        else -> {
+                            Log.d(TAG, "Error")
+                            binding.pb.visibility = View.GONE
+                            binding.lineChart.visibility = View.GONE
+                        }
                     }
                 }
             }
@@ -125,21 +179,14 @@ class InfoFragment : Fragment(R.layout.fragment_info) {
     }
 
     companion object {
-        private val lineSet = listOf(
-            "label1" to 5f,
-            "label2" to 4.5f,
-            "label3" to 4.7f,
-            "label4" to 3.5f,
-            "label5" to 3.6f,
-            "label6" to 7.5f,
-            "label7" to 7.5f,
-            "label8" to 10f,
-            "label9" to 5f,
-            "label10" to 6.5f,
-            "label11" to 3f,
-            "label12" to 4f
-        )
-
         private const val animationDuration = 1000L
     }
+}
+
+private fun List<DBOhlcvsItem>.asPairedList(): List<Pair<String, Float>> {
+    val list = mutableListOf<Pair<String, Float>>()
+    this.forEach {
+        list.add(Pair(it.time_open, it.price_open.toFloat()))
+    }
+    return list
 }

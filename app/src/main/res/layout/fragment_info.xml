@@ -116,8 +116,19 @@
                     android:background="@drawable/picker_background"
                     android:elevation="@dimen/cl_elevation"
                     android:padding="@dimen/basic_margin"
+                    android:visibility="visible"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
+
+                <ProgressBar
+                    android:id="@+id/pb"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:indeterminateTint="@color/main_text_color"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"  />
 
                 <com.db.williamchart.view.LineChartView
                     android:id="@+id/line_chart"
