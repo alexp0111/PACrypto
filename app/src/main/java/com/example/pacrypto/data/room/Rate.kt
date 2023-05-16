@@ -1,4 +1,4 @@
-package com.example.pacrypto.data.room.rates
+package com.example.pacrypto.data.room
 
 data class Rate(
     val asset_id_quote: String,

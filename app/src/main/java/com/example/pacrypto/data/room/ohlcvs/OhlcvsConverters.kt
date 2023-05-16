@@ -1,7 +1,6 @@
 package com.example.pacrypto.data.room.ohlcvs
 
 import androidx.room.TypeConverter
-import com.example.pacrypto.data.room.rates.Rate
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import java.lang.reflect.Type

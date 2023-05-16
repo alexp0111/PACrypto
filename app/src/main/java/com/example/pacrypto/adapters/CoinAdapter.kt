@@ -29,7 +29,6 @@ class CoinAdapter(
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
         val item = searchItemList[position]
-        // val rate = rateListUSD.findRateFor(item.asset_id)
         holder.bind(item)
     }
 
@@ -39,7 +38,9 @@ class CoinAdapter(
     }
 
     fun updateList(searchItemList: ArrayList<SearchItem>) {
-        val tmpList = searchItemList.sortedWith(compareBy(nullsLast()) { it.rateCurrent })
+        val tmpList =
+            if (rateMarker == "$") searchItemList.sortedWith(compareBy(nullsFirst()) { it.rateCurrentUSD }).reversed()
+            else searchItemList.sortedWith(compareBy(nullsLast()) { it.rateCurrentRUB })
         this.searchItemList = ArrayList(tmpList)
         notifyDataSetChanged()
     }
@@ -59,7 +60,7 @@ class CoinAdapter(
             binding.tvName.text = item.name
             binding.tvTicker.text = item.ticker
             binding.tvTicker.isSelected = true
-            if (item.rateCurrent == null || item.timeUpdate == null || item.percents == null) {
+            if (item.rateCurrentUSD == null || item.rateCurrentRUB == null || item.timeUpdate == null || item.percents == null) {
                 binding.tvValue.text = "Нет данных"
                 binding.tvUpdateDate.text = "-"
                 binding.tvPercents.text = "-"
@@ -67,15 +68,19 @@ class CoinAdapter(
                 binding.clEnd.visibility = View.GONE
             } else {
                 binding.clEnd.visibility = View.VISIBLE
-                binding.tvValue.text = buildString {
-                    append(String.format("%.2f", 1.0 / item.rateCurrent!!))
-                    append(rateMarker)
+
+                if (rateMarker == "$"){
+                    binding.tvValue.text = buildString {
+                        append(String.format("%.2f", item.rateCurrentUSD))
+                        append(rateMarker)
+                    }
+                } else {
+                    binding.tvValue.text = buildString {
+                        append(String.format("%.2f", item.rateCurrentRUB))
+                        append(rateMarker)
+                    }
                 }
-                binding.tvUpdateDate.text = buildString {
-                    append(item.timeUpdate!!.substring(0, 10))
-                    append("\n")
-                    append(item.timeUpdate!!.substring(11, 19))
-                }
+                binding.tvUpdateDate.text = item.timeUpdate
                 if (item.percents!!.startsWith("+")) {
                     binding.clEnd.background =
                         ContextCompat.getDrawable(context, R.color.green_300)

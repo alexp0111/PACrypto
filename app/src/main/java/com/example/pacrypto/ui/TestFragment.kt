@@ -28,6 +28,8 @@ class TestFragment : Fragment(R.layout.fragment_test) {
         val binding = FragmentTestBinding.bind(view)
         fragmentTestBinding = binding
 
+        /*
+
         binding.btnUpdate.setOnClickListener {
             viewModel.updateAssets()
         }
@@ -73,6 +75,8 @@ class TestFragment : Fragment(R.layout.fragment_test) {
                 }
             }
         }
+
+         */
     }
 
     override fun onStart() {

@@ -1,9 +1,18 @@
 package com.example.pacrypto.data
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+
+@Entity(tableName = "search_items")
 data class SearchItem(
-    var ticker: String = "",
+    @PrimaryKey var ticker: String = "",
     var name: String? = "",
-    var rateCurrent: Double? = null,
+    var rateCurrentUSD: Double? = null,
+    var rateCurrentRUB: Double? = null,
     var percents: String? = null,
     var timeUpdate: String? = null,
-)
+) {
+    override fun toString(): String {
+        return "$ticker $name $rateCurrentUSD $rateCurrentRUB $percents $timeUpdate"
+    }
+}

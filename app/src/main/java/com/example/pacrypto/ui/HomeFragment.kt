@@ -21,7 +21,6 @@ import com.example.pacrypto.adapters.CoinAdapter
 import com.example.pacrypto.animator.PickerAnimator
 import com.example.pacrypto.animator.SwipeGesture
 import com.example.pacrypto.data.SearchItem
-import com.example.pacrypto.data.room.rates.Rate
 import com.example.pacrypto.databinding.FragmentHomeBinding
 import com.example.pacrypto.util.*
 import com.example.pacrypto.viewmodel.CoinViewModel
@@ -38,10 +37,6 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     private val viewModel: CoinViewModel by viewModels()
 
     private var searchItemList = arrayListOf<SearchItem>()
-    private var ratesUSDAct = listOf<Rate>()
-    private var ratesRUBAct = listOf<Rate>()
-    private var ratesUSDPrv = listOf<Rate>()
-    private var ratesRUBPrv = listOf<Rate>()
 
     private var fragmentHomeBinding: FragmentHomeBinding? = null
     private var currencyPicker = mutableMapOf<ConstraintLayout, TextView>()
@@ -50,8 +45,6 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     private var fabState = FabState.HIDE
     private var searchType = SearchType.TICKER
     private var searchRate = SearchRate.USD
-
-    private var loading = 0
 
     val adapterType1 by lazy {
         CoinAdapter(
@@ -79,7 +72,6 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         val binding = FragmentHomeBinding.bind(view)
         fragmentHomeBinding = binding
 
-
         //set up observers
         observers(binding)
 
@@ -92,11 +84,9 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
             PickerAnimator {
                 if (it == "$") {
                     searchRate = SearchRate.USD
-                    searchItemList.addRates(ratesUSDAct)
                     adapterType1.setRateMarker("$")
                 } else {
                     searchRate = SearchRate.RUB
-                    searchItemList.addRates(ratesRUBAct)
                     adapterType1.setRateMarker("₽")
                 }
             }.animate(resources, context, currencyPicker, pickerCircle)
@@ -149,7 +139,6 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
         // fab
         binding.fabRefresh.setOnClickListener {
-            loading = 0
             viewModel.refreshAllData()
         }
 
@@ -200,7 +189,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                     ivQr.visibility = View.GONE
                     ivSub.visibility = View.GONE
 
-                    viewModel.getExactAsset(etSearch.text.toString(), searchType)
+                    viewModel.getExactSearchItem(etSearch.text.toString(), searchType)
                 }
             }
         }
@@ -231,7 +220,6 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
     override fun onStart() {
         super.onStart()
-        loading = 0
         viewModel.refreshAllData()
     }
 
@@ -239,23 +227,17 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         // All assets
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.allAssets.collect {
+                viewModel.searchItems.collect {
                     when (it) {
                         is UiState.Loading -> showLoadingInfo(binding)
-                        is UiState.Success -> {
-                            loading++
-                            if (loading == 5) showSuccessInfo(binding)
-                        }
-                        is UiState.Failure -> {
-                            loading++
-                            if (loading == 5) showFailureInfo(binding)
-                        }
+                        is UiState.Success -> showSuccessInfo(binding)
+                        is UiState.Failure -> showFailureInfo(binding)
                         else -> {}
                     }
                 }
             }
         }
-
+/*
         // Rates in USD (Actual)
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -264,13 +246,11 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                         is UiState.Loading -> showLoadingInfo(binding)
                         is UiState.Success -> {
                             ratesUSDAct = it.data!!.rates
-                            loading++
-                            if (loading == 5) showSuccessInfo(binding)
+                            if (loading.incrementAndGet() == 5) showSuccessInfo(binding)
                         }
                         is UiState.Failure -> {
-                            loading++
                             ratesUSDAct = it.data?.rates ?: emptyList()
-                            if (loading == 5) showFailureInfo(binding)
+                            if (loading.incrementAndGet() == 5) showFailureInfo(binding)
                         }
                         else -> {}
                     }
@@ -286,13 +266,11 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                         is UiState.Loading -> showLoadingInfo(binding)
                         is UiState.Success -> {
                             ratesUSDPrv = it.data!!.rates
-                            loading++
-                            if (loading == 5) showSuccessInfo(binding)
+                            if (loading.incrementAndGet() == 5) showSuccessInfo(binding)
                         }
                         is UiState.Failure -> {
-                            loading++
                             ratesUSDPrv = it.data?.rates ?: emptyList()
-                            if (loading == 5) showFailureInfo(binding)
+                            if (loading.incrementAndGet() == 5) showFailureInfo(binding)
                         }
                         else -> {}
                     }
@@ -308,13 +286,11 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                         is UiState.Loading -> showLoadingInfo(binding)
                         is UiState.Success -> {
                             ratesRUBAct = it.data!!.rates
-                            loading++
-                            if (loading == 5) showSuccessInfo(binding)
+                            if (loading.incrementAndGet() == 5) showSuccessInfo(binding)
                         }
                         is UiState.Failure -> {
-                            loading++
                             ratesRUBAct = it.data?.rates ?: emptyList()
-                            if (loading == 5) showFailureInfo(binding)
+                            if (loading.incrementAndGet() == 5) showFailureInfo(binding)
                         }
                         else -> {}
                     }
@@ -330,13 +306,11 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                         is UiState.Loading -> showLoadingInfo(binding)
                         is UiState.Success -> {
                             ratesRUBPrv = it.data!!.rates
-                            loading++
-                            if (loading == 5) showSuccessInfo(binding)
+                            if (loading.incrementAndGet() == 5) showSuccessInfo(binding)
                         }
                         is UiState.Failure -> {
-                            loading++
                             ratesRUBPrv = it.data?.rates ?: emptyList()
-                            if (loading == 5) showFailureInfo(binding)
+                            if (loading.incrementAndGet() == 5) showFailureInfo(binding)
                         }
                         else -> {}
                     }
@@ -344,22 +318,17 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
             }
         }
 
+ */
+
         // Search results
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.exactAsset.collect {
-                    if (it is UiState.Loading) {
-                        // loading
-                    }
+                viewModel.exactSearchItem.collect {
                     if (it is UiState.Success && it.data != null) {
-                        searchItemList.addAssets(it.data)
+                        searchItemList = it.data as ArrayList<SearchItem>
                         if (searchRate == SearchRate.USD) {
-                            searchItemList.addRates(ratesUSDAct)
-                            searchItemList.calcPercents(ratesUSDAct, ratesUSDPrv)
                             adapterType1.setRateMarker("$")
                         } else {
-                            searchItemList.addRates(ratesRUBAct)
-                            searchItemList.calcPercents(ratesRUBAct, ratesRUBPrv)
                             adapterType1.setRateMarker("₽")
                         }
                         adapterType1.updateList(searchItemList)
