@@ -4,7 +4,6 @@ import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.view.View.OnTouchListener
 import android.widget.TextView
 import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -20,7 +19,7 @@ import com.example.pacrypto.adapters.InfoAdapter
 import com.example.pacrypto.animator.PickerAnimator
 import com.example.pacrypto.data.room.ohlcvs.DBOhlcvsItem
 import com.example.pacrypto.databinding.FragmentInfoBinding
-import com.example.pacrypto.util.UiState
+import com.example.pacrypto.util.*
 import com.example.pacrypto.viewmodel.OhlcvsViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -62,6 +61,14 @@ class InfoFragment : Fragment(R.layout.fragment_info) {
         ticker = arguments?.getString("ticker") ?: ""
 
         binding.tvHeader.text = name
+
+
+        // Check if favourite
+        if (isItemInSP(requireActivity(), ticker)) {
+            setFavouriteVisibility(true, binding)
+        } else {
+            setFavouriteVisibility(false, binding)
+        }
 
         // Picker rate
         binding.apply {
@@ -146,10 +153,32 @@ class InfoFragment : Fragment(R.layout.fragment_info) {
         binding.rv.adapter = adapter
         binding.rv.isNestedScrollingEnabled = false
 
-        binding.svMain.isVerticalScrollBarEnabled = false
-
         binding.ivFavFalse.setOnClickListener {
-            binding.svMain.setOnTouchListener { _, _ -> false }
+            try {
+                addItemToSP(requireActivity(), ticker)
+                setFavouriteVisibility(true, binding)
+            } catch (e: java.lang.Exception) {
+                Toast.makeText(requireContext(), "Error", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        binding.ivFavTrue.setOnClickListener {
+            try {
+                removeItemFromSP(requireActivity(), ticker)
+                setFavouriteVisibility(false, binding)
+            } catch (e: java.lang.Exception) {
+                Toast.makeText(requireContext(), "Error", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private fun setFavouriteVisibility(isFav: Boolean, binding: FragmentInfoBinding) {
+        if (isFav) {
+            binding.ivFavTrue.visibility = View.VISIBLE
+            binding.ivFavFalse.visibility = View.GONE
+        } else {
+            binding.ivFavTrue.visibility = View.GONE
+            binding.ivFavFalse.visibility = View.VISIBLE
         }
     }
 

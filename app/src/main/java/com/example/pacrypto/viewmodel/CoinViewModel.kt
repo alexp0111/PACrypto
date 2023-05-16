@@ -30,6 +30,10 @@ class CoinViewModel @Inject constructor(
     private val refreshTriggerForExactSearchItem =
         refreshTriggerChannelForExactSearchItem.receiveAsFlow()
 
+    private val refreshTriggerChannelForFavs = Channel<List<String>>()
+    private val refreshTriggerForFavs =
+        refreshTriggerChannelForFavs.receiveAsFlow()
+
     //
 
     val searchItems = refreshTriggerForSearchItems.flatMapLatest { pair ->
@@ -38,6 +42,10 @@ class CoinViewModel @Inject constructor(
 
     val exactSearchItem = refreshTriggerForExactSearchItem.flatMapLatest { pair ->
         repository.getExactSearchItem(pair)
+    }.stateIn(viewModelScope, SharingStarted.Lazily, null)
+
+    val favs = refreshTriggerForFavs.flatMapLatest { list ->
+        repository.getFavs(list)
     }.stateIn(viewModelScope, SharingStarted.Lazily, null)
 
     //
@@ -62,6 +70,12 @@ class CoinViewModel @Inject constructor(
     fun getExactSearchItem(input: String, type: SearchType) {
         viewModelScope.launch {
             refreshTriggerChannelForExactSearchItem.send(Pair(input, type))
+        }
+    }
+
+    fun getFavouriteList(allItemsInSP: List<String>) {
+        viewModelScope.launch {
+            refreshTriggerChannelForFavs.send(allItemsInSP)
         }
     }
 }

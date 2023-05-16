@@ -27,4 +27,8 @@ interface SearchDao {
     @Query("SELECT * FROM search_items WHERE name LIKE '%' || :name || '%'")
     fun getSearchItemsByName(name: String): Flow<List<SearchItem>>
 
+    //
+    @Query("SELECT * FROM search_items WHERE ticker IN (:list)")
+    fun getFavs(list: List<String>): Flow<List<SearchItem>>
+
 }

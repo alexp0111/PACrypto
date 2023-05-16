@@ -178,7 +178,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                     ivQr.visibility = View.VISIBLE
                     ivSub.visibility = View.VISIBLE
 
-                    //TODO: set up bookmarks
+                    viewModel.getFavouriteList(getAllItemsInSP(requireActivity()))
                 } else {
                     fabState = FabState.SHOW
                     fabRefresh.show()
@@ -220,10 +220,35 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
     override fun onStart() {
         super.onStart()
+        viewModel.getFavouriteList(getAllItemsInSP(requireActivity()))
         viewModel.refreshAllData()
     }
 
     private fun observers(binding: FragmentHomeBinding) {
+        // Favourites
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.favs.collect {
+                    if (it is UiState.Success && it.data != null) {
+                        searchItemList = it.data as ArrayList<SearchItem>
+                        if (searchRate == SearchRate.USD) {
+                            adapterType1.setRateMarker("$")
+                        } else {
+                            adapterType1.setRateMarker("₽")
+                        }
+                        adapterType1.updateList(searchItemList)
+                    }
+                    if (it is UiState.Failure) {
+                        Toast.makeText(
+                            requireContext(),
+                            "Не удалось совершить поиск",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+            }
+        }
+
         // All assets
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -237,88 +262,6 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                 }
             }
         }
-/*
-        // Rates in USD (Actual)
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.allUSDRatesAct.collect {
-                    when (it) {
-                        is UiState.Loading -> showLoadingInfo(binding)
-                        is UiState.Success -> {
-                            ratesUSDAct = it.data!!.rates
-                            if (loading.incrementAndGet() == 5) showSuccessInfo(binding)
-                        }
-                        is UiState.Failure -> {
-                            ratesUSDAct = it.data?.rates ?: emptyList()
-                            if (loading.incrementAndGet() == 5) showFailureInfo(binding)
-                        }
-                        else -> {}
-                    }
-                }
-            }
-        }
-
-        // Rates in USD (Previous)
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.allUSDRatesPrv.collect {
-                    when (it) {
-                        is UiState.Loading -> showLoadingInfo(binding)
-                        is UiState.Success -> {
-                            ratesUSDPrv = it.data!!.rates
-                            if (loading.incrementAndGet() == 5) showSuccessInfo(binding)
-                        }
-                        is UiState.Failure -> {
-                            ratesUSDPrv = it.data?.rates ?: emptyList()
-                            if (loading.incrementAndGet() == 5) showFailureInfo(binding)
-                        }
-                        else -> {}
-                    }
-                }
-            }
-        }
-
-        // rates in RUB (Actual)
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.allRUBRatesAct.collect {
-                    when (it) {
-                        is UiState.Loading -> showLoadingInfo(binding)
-                        is UiState.Success -> {
-                            ratesRUBAct = it.data!!.rates
-                            if (loading.incrementAndGet() == 5) showSuccessInfo(binding)
-                        }
-                        is UiState.Failure -> {
-                            ratesRUBAct = it.data?.rates ?: emptyList()
-                            if (loading.incrementAndGet() == 5) showFailureInfo(binding)
-                        }
-                        else -> {}
-                    }
-                }
-            }
-        }
-
-        // rates in RUB (Previous)
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.allRUBRatesPrv.collect {
-                    when (it) {
-                        is UiState.Loading -> showLoadingInfo(binding)
-                        is UiState.Success -> {
-                            ratesRUBPrv = it.data!!.rates
-                            if (loading.incrementAndGet() == 5) showSuccessInfo(binding)
-                        }
-                        is UiState.Failure -> {
-                            ratesRUBPrv = it.data?.rates ?: emptyList()
-                            if (loading.incrementAndGet() == 5) showFailureInfo(binding)
-                        }
-                        else -> {}
-                    }
-                }
-            }
-        }
-
- */
 
         // Search results
         viewLifecycleOwner.lifecycleScope.launch {

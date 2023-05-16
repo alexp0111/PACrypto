@@ -61,92 +61,6 @@ class CoinRepository @Inject constructor(
             searchDao.getSearchItemsByTicker(pair.first).collect { send(UiState.Success(it)) }
         }
     }
-    /*
-
-    fun getAssets() = networkBoundResource(
-        query = {
-            assetDao.getAllAssets()
-        },
-        fetch = {
-            api.getAssets()
-        },
-        saveFetchResult = { assets ->
-            assets.forEach {
-                Log.d(TAG, it.asset_id)
-            }
-            db_asset.withTransaction {
-                assetDao.deleteAllAssets()
-                assetDao.insertAssets(assets.asDBType())
-            }
-        }
-    )
-
-    fun getUSDRates(
-        time: String,
-        actual: Boolean,
-    ) = networkBoundResource(
-        query = {
-            if (actual) {
-                rateDao.getAllUSDRatesAct()
-            } else {
-                rateDao.getAllUSDRatesPrv()
-            }
-        },
-        fetch = {
-            api.getUSDRates(time)
-        },
-        saveFetchResult = { rate ->
-            rate.rates.forEach {
-                Log.d(
-                    TAG + "_USD",
-                    it.rate.toString() + " | " + it.time + " | " + it.asset_id_quote
-                )
-            }
-            db_rate.withTransaction {
-                if (actual) {
-                    rateDao.deleteAllUSDRatesAct()
-                    rateDao.insertUSDRatesAct(rate.asDBType("usd", "act"))
-                } else {
-                    rateDao.deleteAllUSDRatesPrv()
-                    rateDao.insertUSDRatesPrv(rate.asDBType("usd", "prv"))
-                }
-            }
-        }
-    )
-
-    fun getRUBRates(
-        time: String,
-        actual: Boolean,
-    ) = networkBoundResource(
-        query = {
-            if (actual) {
-                rateDao.getAllRUBRatesAct()
-            } else {
-                rateDao.getAllRUBRatesPrv()
-            }
-        },
-        fetch = {
-            api.getRUBRates(time)
-        },
-        saveFetchResult = { rate ->
-            rate.rates.forEach {
-                Log.d(
-                    TAG + "_RUB",
-                    it.rate.toString() + " | " + it.time + " | " + it.asset_id_quote
-                )
-            }
-            db_rate.withTransaction {
-                if (actual) {
-                    rateDao.deleteAllRUBRatesAct()
-                    rateDao.insertRUBRatesAct(rate.asDBType("rub", "act"))
-                } else {
-                    rateDao.deleteAllRUBRatesPrv()
-                    rateDao.insertRUBRatesPrv(rate.asDBType("rub", "prv"))
-                }
-            }
-        }
-    )
-     */
 
 
     fun getOhlcv(
@@ -182,16 +96,9 @@ class CoinRepository @Inject constructor(
         shouldFetch = { shouldFetch }
     )
 
-/*
-    fun getExactAsset(
-        pair: Pair<String, SearchType>,
-    ) = channelFlow<UiState<List<DBAsset>>> {
-        if (pair.second == SearchType.NAME) {
-            assetDao.getAssetsByName(pair.first).collect { send(UiState.Success(it)) }
-        } else {
-            assetDao.getAssetsByTicker(pair.first).collect { send(UiState.Success(it)) }
-        }
+    fun getFavs(
+        list: List<String>,
+    ) = channelFlow<UiState<List<SearchItem>>> {
+        searchDao.getFavs(list).collect { send(UiState.Success(it)) }
     }
-
- */
 }
