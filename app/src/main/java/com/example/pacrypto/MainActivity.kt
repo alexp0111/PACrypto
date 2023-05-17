@@ -1,7 +1,14 @@
 package com.example.pacrypto
 
+import android.content.ComponentName
+import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.work.Constraints
+import androidx.work.NetworkType
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
+import com.example.pacrypto.data.worker.SubWorker
 import com.example.pacrypto.databinding.ActivityMainBinding
 import com.example.pacrypto.ui.HomeFragment
 import dagger.hilt.android.AndroidEntryPoint
