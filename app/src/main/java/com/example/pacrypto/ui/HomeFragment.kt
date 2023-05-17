@@ -152,11 +152,15 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         val swipeGesture = object : SwipeGesture(requireContext()) {
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 if (direction == ItemTouchHelper.RIGHT) {
+                    val tickerToDelete =
+                        searchItemList.get(viewHolder.absoluteAdapterPosition).ticker
+                    removeItemFromSP(requireActivity(), tickerToDelete)
                     adapterType1.deleteItem(viewHolder.absoluteAdapterPosition)
 
                     Snackbar.make(requireView(), "Убрано из закладок", Snackbar.LENGTH_LONG)
                         .setAction("Восстановить") {
-                            //TODO:
+                            addItemToSP(requireActivity(), tickerToDelete)
+                            viewModel.getFavouriteList(getAllItemsInSP(requireActivity()))
                         }.show()
                 }
             }
@@ -178,6 +182,8 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                     ivQr.visibility = View.VISIBLE
                     ivSub.visibility = View.VISIBLE
 
+                    touchHelper.attachToRecyclerView(binding.rv)
+
                     viewModel.getFavouriteList(getAllItemsInSP(requireActivity()))
                 } else {
                     fabState = FabState.SHOW
@@ -188,6 +194,8 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                     tvTicker.visibility = View.VISIBLE
                     ivQr.visibility = View.GONE
                     ivSub.visibility = View.GONE
+
+                    touchHelper.attachToRecyclerView(null)
 
                     viewModel.getExactSearchItem(etSearch.text.toString(), searchType)
                 }
