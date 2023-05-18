@@ -13,16 +13,23 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.work.*
 import com.db.williamchart.ExperimentalFeature
 import com.example.pacrypto.R
 import com.example.pacrypto.adapters.InfoAdapter
 import com.example.pacrypto.animator.PickerAnimator
 import com.example.pacrypto.data.room.ohlcvs.DBOhlcvsItem
+import com.example.pacrypto.data.worker.SubItem
+import com.example.pacrypto.data.worker.SubWorker
 import com.example.pacrypto.databinding.FragmentInfoBinding
 import com.example.pacrypto.util.*
 import com.example.pacrypto.viewmodel.OhlcvsViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import java.time.Duration
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.util.*
 
 
 private const val TAG = "INFO_FRAGMENT"
@@ -64,10 +71,16 @@ class InfoFragment : Fragment(R.layout.fragment_info) {
 
 
         // Check if favourite
-        if (isItemInSP(requireActivity(), ticker)) {
+        if (isFavItemInSP(requireActivity(), ticker)) {
             setFavouriteVisibility(true, binding)
         } else {
             setFavouriteVisibility(false, binding)
+        }
+
+        if (isSubItemInSP(requireActivity(), ticker)) {
+            setSubVisibility(true, binding)
+        } else {
+            setSubVisibility(false, binding)
         }
 
         // Picker rate
@@ -155,7 +168,7 @@ class InfoFragment : Fragment(R.layout.fragment_info) {
 
         binding.ivFavFalse.setOnClickListener {
             try {
-                addItemToSP(requireActivity(), ticker)
+                addFavItemToSP(requireActivity(), ticker)
                 setFavouriteVisibility(true, binding)
             } catch (e: java.lang.Exception) {
                 Toast.makeText(requireContext(), "Error", Toast.LENGTH_SHORT).show()
@@ -164,8 +177,49 @@ class InfoFragment : Fragment(R.layout.fragment_info) {
 
         binding.ivFavTrue.setOnClickListener {
             try {
-                removeItemFromSP(requireActivity(), ticker)
+                removeFavItemFromSP(requireActivity(), ticker)
                 setFavouriteVisibility(false, binding)
+            } catch (e: java.lang.Exception) {
+                Toast.makeText(requireContext(), "Error", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        binding.ivSubFalse.setOnClickListener {
+            try {
+
+                val getRequest = PeriodicWorkRequestBuilder<SubWorker>(Duration.ofMillis(5000L))
+                    .setInputData(Data.Builder().putString("ticker", ticker).build())
+                    .setConstraints(
+                        Constraints.Builder()
+                            .setRequiredNetworkType(
+                                NetworkType.CONNECTED
+                            )
+                            .build()
+                    ).build()
+
+                val workManager = WorkManager.getInstance(requireContext())
+
+                workManager.enqueue(getRequest)
+
+                addSubItemToSP(requireActivity(),
+                    SubItem(
+                        ticker,
+                        LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_TIME),
+                        getRequest.id
+                    )
+                )
+                setSubVisibility(true, binding)
+            } catch (e: java.lang.Exception) {
+                Toast.makeText(requireContext(), "Error", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        binding.ivSubTrue.setOnClickListener {
+            try {
+                val uuid = removeSubItemFromSP(requireActivity(), ticker)
+                val workManager = WorkManager.getInstance(requireContext())
+                workManager.cancelWorkById(uuid)
+                setSubVisibility(false, binding)
             } catch (e: java.lang.Exception) {
                 Toast.makeText(requireContext(), "Error", Toast.LENGTH_SHORT).show()
             }
@@ -179,6 +233,16 @@ class InfoFragment : Fragment(R.layout.fragment_info) {
         } else {
             binding.ivFavTrue.visibility = View.GONE
             binding.ivFavFalse.visibility = View.VISIBLE
+        }
+    }
+
+    private fun setSubVisibility(isSub: Boolean, binding: FragmentInfoBinding) {
+        if (isSub) {
+            binding.ivSubTrue.visibility = View.VISIBLE
+            binding.ivSubFalse.visibility = View.GONE
+        } else {
+            binding.ivSubTrue.visibility = View.GONE
+            binding.ivSubFalse.visibility = View.VISIBLE
         }
     }
 

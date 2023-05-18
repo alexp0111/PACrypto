@@ -154,13 +154,13 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                 if (direction == ItemTouchHelper.RIGHT) {
                     val tickerToDelete =
                         searchItemList.get(viewHolder.absoluteAdapterPosition).ticker
-                    removeItemFromSP(requireActivity(), tickerToDelete)
+                    removeFavItemFromSP(requireActivity(), tickerToDelete)
                     adapterType1.deleteItem(viewHolder.absoluteAdapterPosition)
 
                     Snackbar.make(requireView(), "Убрано из закладок", Snackbar.LENGTH_LONG)
                         .setAction("Восстановить") {
-                            addItemToSP(requireActivity(), tickerToDelete)
-                            viewModel.getFavouriteList(getAllItemsInSP(requireActivity()))
+                            addFavItemToSP(requireActivity(), tickerToDelete)
+                            viewModel.getFavouriteList(getAllFavItemsInSP(requireActivity()))
                         }.show()
                 }
             }
@@ -184,7 +184,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
                     touchHelper.attachToRecyclerView(binding.rv)
 
-                    viewModel.getFavouriteList(getAllItemsInSP(requireActivity()))
+                    viewModel.getFavouriteList(getAllFavItemsInSP(requireActivity()))
                 } else {
                     fabState = FabState.SHOW
                     fabRefresh.show()
@@ -228,8 +228,8 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
     override fun onStart() {
         super.onStart()
-        viewModel.getFavouriteList(getAllItemsInSP(requireActivity()))
-        viewModel.refreshAllData()
+        viewModel.getFavouriteList(getAllFavItemsInSP(requireActivity()))
+        // viewModel.refreshAllData()
     }
 
     private fun observers(binding: FragmentHomeBinding) {

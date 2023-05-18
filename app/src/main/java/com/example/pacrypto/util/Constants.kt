@@ -5,5 +5,6 @@ object AnimationDelays {
 }
 
 object Prefs {
-    val FILE_NAME = "favourite_items"
+    val FILE_NAME_FAV = "favourite_items"
+    val FILE_NAME_SUB = "subscription_items"
 }

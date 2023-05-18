@@ -2,7 +2,6 @@ package com.example.pacrypto.data
 
 import com.example.pacrypto.data.api_data.ApiAsset
 import com.example.pacrypto.data.api_data.ApiListRates
-import com.example.pacrypto.data.room.Rate
 import kotlin.math.abs
 
 object SearchItemConverter {

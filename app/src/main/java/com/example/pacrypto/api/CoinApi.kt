@@ -21,6 +21,12 @@ interface CoinApi {
     suspend fun getAssets(): List<ApiAsset>
 
     @Headers("X-CoinAPI-Key: $API_KEY")
+    @GET("assets/{asset_id}")
+    suspend fun getExactAsset(
+        @Path("asset_id") id: String
+    ): List<ApiAsset>
+
+    @Headers("X-CoinAPI-Key: $API_KEY")
     @GET("exchangerate/USD")
     suspend fun getUSDRates(
         @Query("time") time: String

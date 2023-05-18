@@ -16,6 +16,17 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/tv_test" />
 
+    <Button
+        android:id="@+id/btn_remove"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_margin="@dimen/basic_margin"
+        android:text="remove"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/tv_test" />
+
     <TextView
         android:id="@+id/tv_test"
         app:layout_constraintTop_toTopOf="parent"
