@@ -1,10 +1,12 @@
 package com.example.pacrypto.ui
 
+import android.app.TimePickerDialog
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.TextView
+import android.widget.TimePicker
 import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
@@ -26,16 +28,16 @@ import com.example.pacrypto.util.*
 import com.example.pacrypto.viewmodel.OhlcvsViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
 import java.time.Duration
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 
 private const val TAG = "INFO_FRAGMENT"
 
 @AndroidEntryPoint
-class InfoFragment : Fragment(R.layout.fragment_info) {
+class InfoFragment : Fragment(R.layout.fragment_info), TimePickerDialog.OnTimeSetListener {
 
     private val viewModel: OhlcvsViewModel by viewModels()
     private var dataList: List<List<DBOhlcvsItem>>? = null
@@ -186,28 +188,14 @@ class InfoFragment : Fragment(R.layout.fragment_info) {
 
         binding.ivSubFalse.setOnClickListener {
             try {
+                TimePickerDialog(
+                    requireContext(),
+                    this,
+                    Calendar.getInstance().get(Calendar.HOUR_OF_DAY),
+                    Calendar.getInstance().get(Calendar.MINUTE),
+                    false
+                ).show()
 
-                val getRequest = PeriodicWorkRequestBuilder<SubWorker>(Duration.ofMillis(5000L))
-                    .setInputData(Data.Builder().putString("ticker", ticker).build())
-                    .setConstraints(
-                        Constraints.Builder()
-                            .setRequiredNetworkType(
-                                NetworkType.CONNECTED
-                            )
-                            .build()
-                    ).build()
-
-                val workManager = WorkManager.getInstance(requireContext())
-
-                workManager.enqueue(getRequest)
-
-                addSubItemToSP(requireActivity(),
-                    SubItem(
-                        ticker,
-                        LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_TIME),
-                        getRequest.id
-                    )
-                )
                 setSubVisibility(true, binding)
             } catch (e: java.lang.Exception) {
                 Toast.makeText(requireContext(), "Error", Toast.LENGTH_SHORT).show()
@@ -224,6 +212,41 @@ class InfoFragment : Fragment(R.layout.fragment_info) {
                 Toast.makeText(requireContext(), "Error", Toast.LENGTH_SHORT).show()
             }
         }
+    }
+
+    private fun setUpSubscription(settedCalendar: Calendar): UUID {
+
+        Log.d(TAG, settedCalendar.time.toString())
+
+        val calendar = Calendar.getInstance()
+        val curTimeInMinutes =
+            (calendar.get(Calendar.HOUR_OF_DAY) * 60 + calendar.get(Calendar.MINUTE)).toLong()
+        val goalTimeInMinutes =
+            (settedCalendar.get(Calendar.HOUR_OF_DAY) * 60 + settedCalendar.get(Calendar.MINUTE)).toLong()
+
+        val delay = if (curTimeInMinutes < goalTimeInMinutes) {
+            Duration.ofMinutes(goalTimeInMinutes - curTimeInMinutes)
+        } else {
+            Duration.ofMinutes(1440 - curTimeInMinutes + goalTimeInMinutes)
+        }
+
+        val getRequest = PeriodicWorkRequestBuilder<SubWorker>(Duration.ofHours(24L))
+            .setInputData(Data.Builder().putString("ticker", ticker).build())
+            .setInitialDelay(delay)
+            .setScheduleRequestedAt(24L, TimeUnit.HOURS)
+            .setConstraints(
+                Constraints.Builder()
+                    .setRequiredNetworkType(
+                        NetworkType.CONNECTED
+                    )
+                    .build()
+            ).build()
+
+        val workManager = WorkManager.getInstance(requireContext())
+
+        workManager.enqueue(getRequest)
+
+        return getRequest.id
     }
 
     private fun setFavouriteVisibility(isFav: Boolean, binding: FragmentInfoBinding) {
@@ -248,7 +271,7 @@ class InfoFragment : Fragment(R.layout.fragment_info) {
 
     override fun onStart() {
         super.onStart()
-        viewModel.getExactOhlcvs(ticker, "USD")
+        // viewModel.getExactOhlcvs(ticker, "USD")
     }
 
     private fun observers(binding: FragmentInfoBinding) {
@@ -326,6 +349,23 @@ class InfoFragment : Fragment(R.layout.fragment_info) {
 
     companion object {
         private const val animationDuration = 1000L
+    }
+
+    override fun onTimeSet(p0: TimePicker?, p1: Int, p2: Int) {
+        val calendar = Calendar.getInstance()
+        calendar.set(Calendar.HOUR_OF_DAY, p1)
+        calendar.set(Calendar.MINUTE, p2)
+        val time = calendar.time
+        val uuid = setUpSubscription(calendar)
+
+        addSubItemToSP(
+            requireActivity(),
+            SubItem(
+                ticker,
+                SimpleDateFormat("HH:mm").format(time),
+                uuid
+            )
+        )
     }
 }
 
