@@ -23,6 +23,7 @@ import com.example.pacrypto.animator.PickerAnimator
 import com.example.pacrypto.data.room.ohlcvs.DBOhlcvsItem
 import com.example.pacrypto.data.worker.SubItem
 import com.example.pacrypto.data.worker.SubWorker
+import com.example.pacrypto.data.worker.setUpSubscription
 import com.example.pacrypto.databinding.FragmentInfoBinding
 import com.example.pacrypto.util.*
 import com.example.pacrypto.viewmodel.OhlcvsViewModel
@@ -193,7 +194,7 @@ class InfoFragment : Fragment(R.layout.fragment_info), TimePickerDialog.OnTimeSe
                     this,
                     Calendar.getInstance().get(Calendar.HOUR_OF_DAY),
                     Calendar.getInstance().get(Calendar.MINUTE),
-                    false
+                    true
                 ).show()
 
                 setSubVisibility(true, binding)
@@ -212,41 +213,6 @@ class InfoFragment : Fragment(R.layout.fragment_info), TimePickerDialog.OnTimeSe
                 Toast.makeText(requireContext(), "Error", Toast.LENGTH_SHORT).show()
             }
         }
-    }
-
-    private fun setUpSubscription(settedCalendar: Calendar): UUID {
-
-        Log.d(TAG, settedCalendar.time.toString())
-
-        val calendar = Calendar.getInstance()
-        val curTimeInMinutes =
-            (calendar.get(Calendar.HOUR_OF_DAY) * 60 + calendar.get(Calendar.MINUTE)).toLong()
-        val goalTimeInMinutes =
-            (settedCalendar.get(Calendar.HOUR_OF_DAY) * 60 + settedCalendar.get(Calendar.MINUTE)).toLong()
-
-        val delay = if (curTimeInMinutes < goalTimeInMinutes) {
-            Duration.ofMinutes(goalTimeInMinutes - curTimeInMinutes)
-        } else {
-            Duration.ofMinutes(1440 - curTimeInMinutes + goalTimeInMinutes)
-        }
-
-        val getRequest = PeriodicWorkRequestBuilder<SubWorker>(Duration.ofHours(24L))
-            .setInputData(Data.Builder().putString("ticker", ticker).build())
-            .setInitialDelay(delay)
-            .setScheduleRequestedAt(24L, TimeUnit.HOURS)
-            .setConstraints(
-                Constraints.Builder()
-                    .setRequiredNetworkType(
-                        NetworkType.CONNECTED
-                    )
-                    .build()
-            ).build()
-
-        val workManager = WorkManager.getInstance(requireContext())
-
-        workManager.enqueue(getRequest)
-
-        return getRequest.id
     }
 
     private fun setFavouriteVisibility(isFav: Boolean, binding: FragmentInfoBinding) {
@@ -356,23 +322,21 @@ class InfoFragment : Fragment(R.layout.fragment_info), TimePickerDialog.OnTimeSe
         calendar.set(Calendar.HOUR_OF_DAY, p1)
         calendar.set(Calendar.MINUTE, p2)
         val time = calendar.time
-        val uuid = setUpSubscription(calendar)
+
+        val item = SubItem(
+            ticker =  ticker,
+            time =  SimpleDateFormat("HH:mm").format(time),
+            uuid =  UUID.randomUUID()
+        )
+        val uuid = setUpSubscription(calendar, item, requireContext())
 
         addSubItemToSP(
             requireActivity(),
             SubItem(
-                ticker,
-                SimpleDateFormat("HH:mm").format(time),
-                uuid
+                ticker =  ticker,
+                time =  SimpleDateFormat("HH:mm").format(time),
+                uuid =  uuid
             )
         )
     }
-}
-
-private fun List<DBOhlcvsItem>.asPairedList(): List<Pair<String, Float>> {
-    val list = mutableListOf<Pair<String, Float>>()
-    this.forEach {
-        list.add(Pair(it.time_open, it.price_open.toFloat()))
-    }
-    return list
 }

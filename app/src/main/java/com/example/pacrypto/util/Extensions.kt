@@ -3,6 +3,7 @@ package com.example.pacrypto.util
 import com.example.pacrypto.data.api_data.ApiOhlcv
 import com.example.pacrypto.data.room.ohlcvs.DBOhlcvs
 import com.example.pacrypto.data.room.ohlcvs.DBOhlcvsItem
+import java.util.*
 
 fun List<List<ApiOhlcv>>.asDBType(type: String): DBOhlcvs {
     val newList = mutableListOf<MutableList<DBOhlcvsItem>>()
@@ -30,4 +31,25 @@ private fun ApiOhlcv.asDBType(): DBOhlcvsItem {
         trades_count = this.trades_count,
         volume_traded = this.volume_traded
     )
+}
+
+fun List<DBOhlcvsItem>.asPairedList(): List<Pair<String, Float>> {
+    val list = mutableListOf<Pair<String, Float>>()
+    this.forEach {
+        list.add(Pair(it.time_open, it.price_open.toFloat()))
+    }
+    return list
+}
+
+fun Int.toCalendarConstant(): Int {
+    return when (this) {
+        0 -> Calendar.MONDAY
+        1 -> Calendar.TUESDAY
+        2 -> Calendar.WEDNESDAY
+        3 -> Calendar.THURSDAY
+        4 -> Calendar.FRIDAY
+        5 -> Calendar.SATURDAY
+        6 -> Calendar.SUNDAY
+        else -> Calendar.MONDAY
+    }
 }

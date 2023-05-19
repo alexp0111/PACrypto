@@ -43,13 +43,6 @@
                         android:fontFamily="@font/inter_regular"
                         android:text="BTC" />
 
-                    <TextView
-                        android:id="@+id/tv_name"
-                        style="@style/TextAcc"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Bitcoin" />
-
                 </LinearLayout>
 
                 <LinearLayout
@@ -60,23 +53,19 @@
                     android:background="@drawable/time_background"
                     android:gravity="center_vertical"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@+id/tv_value"
+                    app:layout_constraintEnd_toStartOf="@+id/iv_delete"
                     app:layout_constraintStart_toEndOf="@+id/ll_ticker_and_name"
                     app:layout_constraintTop_toTopOf="parent">
 
-                    <EditText
-                        android:id="@+id/et_search"
+                    <TextView
+                        android:id="@+id/tv_time"
                         style="@style/TextHeader"
-                        android:textCursorDrawable="@drawable/color_cursor"
                         android:hapticFeedbackEnabled="true"
-                        android:layout_width="match_parent"
+                       android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_marginHorizontal="@dimen/basic_margin"
-                        android:background="@null"
                         android:fontFamily="@font/inter_regular"
                         android:gravity="center"
-                        android:hint="Time"
-                        android:inputType="time"
                         android:lines="1"
                         android:maxLines="1"
                         android:text="12:00" />
@@ -85,7 +74,7 @@
                 </LinearLayout>
 
                 <ImageView
-                    android:id="@+id/tv_value"
+                    android:id="@+id/iv_delete"
                     android:layout_width="28dp"
                     android:layout_height="28dp"
                     android:layout_margin="@dimen/basic_margin"
@@ -140,7 +129,7 @@
                     android:background="@drawable/week_item_background"
                     android:gravity="center"
                     android:text="ВТ"
-                    android:textColor="@color/color_off"
+                    android:textColor="@color/color_on"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@id/tv_week_3"
                     app:layout_constraintStart_toEndOf="@id/tv_week_1"
@@ -185,7 +174,7 @@
                     android:background="@drawable/week_item_background"
                     android:gravity="center"
                     android:text="ПТ"
-                    android:textColor="@color/color_off"
+                    android:textColor="@color/color_on"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@id/tv_week_6"
                     app:layout_constraintStart_toEndOf="@id/tv_week_4"
@@ -200,7 +189,7 @@
                     android:background="@drawable/week_item_background"
                     android:gravity="center"
                     android:text="СБ"
-                    android:textColor="@color/color_off"
+                    android:textColor="@color/color_on"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@id/tv_week_7"
                     app:layout_constraintStart_toEndOf="@id/tv_week_5"

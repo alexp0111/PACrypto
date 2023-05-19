@@ -2,20 +2,20 @@ package com.example.pacrypto.data.worker
 
 import android.app.NotificationManager
 import android.content.Context
-import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat.getSystemService
 import androidx.hilt.work.HiltWorker
-import androidx.work.CoroutineWorker
-import androidx.work.WorkerParameters
+import androidx.work.*
 import com.example.pacrypto.R
 import com.example.pacrypto.api.CoinApi
+import com.example.pacrypto.util.Sub
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
+import java.time.Duration
+import java.util.*
+import java.util.concurrent.TimeUnit
 import kotlin.random.Random
 
 @HiltWorker
@@ -26,9 +26,15 @@ class SubWorker @AssistedInject constructor(
 ) : CoroutineWorker(context, workerParams) {
 
     override suspend fun doWork(): Result {
-        val asset_id = inputData.getString("ticker")
-        val asset = withContext(Dispatchers.IO){
-            api.getExactAsset(asset_id!!)[0]
+        val assetId = inputData.getString("ticker")
+        val weekdays = inputData.getIntArray("week_days") ?: Sub.weekDays.toIntArray()
+
+        if (Calendar.getInstance()
+                .get(Calendar.DAY_OF_WEEK) !in weekdays.asList()
+        ) return Result.success()
+
+        val asset = withContext(Dispatchers.IO) {
+            api.getExactAsset(assetId!!)[0]
         }
         startForegroundService(asset.asset_id, asset.name, asset.price_usd)
         return Result.success()

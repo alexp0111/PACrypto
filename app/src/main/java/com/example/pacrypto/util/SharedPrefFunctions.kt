@@ -64,6 +64,26 @@ fun addSubItemToSP(requireActivity: FragmentActivity, subItem: SubItem) {
     prefs.edit().putString(subItem.ticker, Gson().toJson(subItem)).apply()
 }
 
+fun getAllSubItemsInSP(requireActivity: FragmentActivity): List<SubItem> {
+    val list = mutableListOf<SubItem>()
+    val prefs =
+        requireActivity.getSharedPreferences(Prefs.FILE_NAME_SUB, Context.MODE_PRIVATE)
+
+    prefs.all.forEach {
+        list.add(Gson().fromJson(it.value.toString(), SubItem::class.java))
+    }
+
+    return list
+}
+
+fun getSubItemsInSP(requireActivity: FragmentActivity, ticker: String): SubItem {
+    val prefs =
+        requireActivity.getSharedPreferences(Prefs.FILE_NAME_SUB, Context.MODE_PRIVATE)
+
+    val subItem = Gson().fromJson(prefs.getString(ticker, ""), SubItem::class.java)
+    return subItem
+}
+
 fun removeSubItemFromSP(requireActivity: FragmentActivity, ticker: String): UUID {
     val prefs =
         requireActivity.getSharedPreferences(Prefs.FILE_NAME_SUB, Context.MODE_PRIVATE)

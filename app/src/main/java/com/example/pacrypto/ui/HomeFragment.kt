@@ -46,7 +46,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     private var searchType = SearchType.TICKER
     private var searchRate = SearchRate.USD
 
-    val adapterType1 by lazy {
+    val coinAdapter by lazy {
         CoinAdapter(
             requireContext(),
             onItemClicked = { pos, item ->
@@ -84,10 +84,10 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
             PickerAnimator {
                 if (it == "$") {
                     searchRate = SearchRate.USD
-                    adapterType1.setRateMarker("$")
+                    coinAdapter.setRateMarker("$")
                 } else {
                     searchRate = SearchRate.RUB
-                    adapterType1.setRateMarker("₽")
+                    coinAdapter.setRateMarker("₽")
                 }
             }.animate(resources, context, currencyPicker, pickerCircle)
         }
@@ -132,7 +132,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         // subscriptions button listener
         binding.ivSub.setOnClickListener {
             parentFragmentManager.beginTransaction()
-                .replace(R.id.container_main, TestFragment())
+                .replace(R.id.container_main, SubscriptionsFragment())
                 .addToBackStack(null).commit()
         }
 
@@ -147,7 +147,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         val manager = LinearLayoutManager(context)
         manager.orientation = LinearLayoutManager.VERTICAL
         binding.rv.layoutManager = manager
-        binding.rv.adapter = adapterType1
+        binding.rv.adapter = coinAdapter
 
         val swipeGesture = object : SwipeGesture(requireContext()) {
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
@@ -155,7 +155,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                     val tickerToDelete =
                         searchItemList.get(viewHolder.absoluteAdapterPosition).ticker
                     removeFavItemFromSP(requireActivity(), tickerToDelete)
-                    adapterType1.deleteItem(viewHolder.absoluteAdapterPosition)
+                    coinAdapter.deleteItem(viewHolder.absoluteAdapterPosition)
 
                     Snackbar.make(requireView(), "Убрано из закладок", Snackbar.LENGTH_LONG)
                         .setAction("Восстановить") {
@@ -240,11 +240,11 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                     if (it is UiState.Success && it.data != null) {
                         searchItemList = it.data as ArrayList<SearchItem>
                         if (searchRate == SearchRate.USD) {
-                            adapterType1.setRateMarker("$")
+                            coinAdapter.setRateMarker("$")
                         } else {
-                            adapterType1.setRateMarker("₽")
+                            coinAdapter.setRateMarker("₽")
                         }
-                        adapterType1.updateList(searchItemList)
+                        coinAdapter.updateList(searchItemList)
                     }
                     if (it is UiState.Failure) {
                         Toast.makeText(
@@ -278,11 +278,11 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                     if (it is UiState.Success && it.data != null) {
                         searchItemList = it.data as ArrayList<SearchItem>
                         if (searchRate == SearchRate.USD) {
-                            adapterType1.setRateMarker("$")
+                            coinAdapter.setRateMarker("$")
                         } else {
-                            adapterType1.setRateMarker("₽")
+                            coinAdapter.setRateMarker("₽")
                         }
-                        adapterType1.updateList(searchItemList)
+                        coinAdapter.updateList(searchItemList)
                     }
                     if (it is UiState.Failure) {
                         Toast.makeText(

@@ -1,10 +1,5 @@
 package com.example.pacrypto.util
 
-
-enum class Refresh {
-    FORCE, NORMAL
-}
-
 enum class FabState {
     SHOW, HIDE
 }
