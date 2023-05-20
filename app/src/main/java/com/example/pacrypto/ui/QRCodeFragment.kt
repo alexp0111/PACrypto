@@ -42,11 +42,11 @@ class QRCodeFragment : Fragment(R.layout.fragment_q_r_code) {
                 if (data != null) {
                     val result = IntentIntegrator.parseActivityResult(result.resultCode, data)
                     val text = result.contents
-                    if (text != null && text.matches(Regex("[A-Za-z0-9]+-[A-Za-z0-9]+"))) {
+                    if (text != null && text.matches(Regex("[A-Za-z]+://[A-Za-z]+\\.[A-Za-z]+/[A-Za-z]+/[A-Za-z]+"))) {
                         val fragment = InfoFragment()
                         val bundle = Bundle()
-                        bundle.putString("ticker", text.substringBefore('-'))
-                        bundle.putString("name", text.substringAfter('-'))
+                        bundle.putString("ticker", text.substringBeforeLast('/').substringAfterLast('/'))
+                        bundle.putString("name", text.substringAfterLast('/'))
                         fragment.arguments = bundle
 
                         parentFragmentManager.beginTransaction().addToBackStack(null)
