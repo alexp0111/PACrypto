@@ -237,7 +237,7 @@ class InfoFragment : Fragment(R.layout.fragment_info), TimePickerDialog.OnTimeSe
 
     override fun onStart() {
         super.onStart()
-        // viewModel.getExactOhlcvs(ticker, "USD")
+        viewModel.getExactOhlcvs(ticker, "USD")
     }
 
     private fun observers(binding: FragmentInfoBinding) {

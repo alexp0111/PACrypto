@@ -54,6 +54,10 @@ dependencies {
     // graph
     implementation 'com.diogobernardino:williamchart:3.10.1'
 
+    // QR scanner
+    implementation 'com.google.zxing:core:3.4.1'
+    implementation 'com.journeyapps:zxing-android-embedded:4.2.0'
+
     // swipe
     implementation 'it.xabaras.android:recyclerview-swipedecorator:1.4'
 

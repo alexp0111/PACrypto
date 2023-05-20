@@ -136,6 +136,13 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                 .addToBackStack(null).commit()
         }
 
+        // qr code scanning
+        binding.ivQr.setOnClickListener {
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.container_main, QRCodeFragment())
+                .addToBackStack(null).commit()
+        }
+
 
         // fab
         binding.fabRefresh.setOnClickListener {
