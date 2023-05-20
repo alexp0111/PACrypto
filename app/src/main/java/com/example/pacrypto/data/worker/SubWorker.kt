@@ -13,7 +13,13 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.time.DayOfWeek
 import java.time.Duration
+import java.time.Instant
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.ZoneOffset
+import java.time.temporal.TemporalField
 import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.random.Random
@@ -22,15 +28,15 @@ import kotlin.random.Random
 class SubWorker @AssistedInject constructor(
     @Assisted private val context: Context,
     @Assisted private val workerParams: WorkerParameters,
-    private val api: CoinApi
+    private val api: CoinApi,
+    private val calendar: Calendar
 ) : CoroutineWorker(context, workerParams) {
 
     override suspend fun doWork(): Result {
         val assetId = inputData.getString("ticker")
         val weekdays = inputData.getIntArray("week_days") ?: Sub.weekDays.toIntArray()
 
-        if (Calendar.getInstance()
-                .get(Calendar.DAY_OF_WEEK) !in weekdays.asList()
+        if (calendar.get(Calendar.DAY_OF_WEEK) !in weekdays.asList()
         ) return Result.success()
 
         val asset = withContext(Dispatchers.IO) {

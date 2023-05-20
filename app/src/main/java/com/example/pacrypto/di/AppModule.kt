@@ -11,6 +11,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.util.Calendar
 import javax.inject.Singleton
 
 @InstallIn(SingletonComponent::class)
@@ -42,4 +43,8 @@ object AppModule {
         Room.databaseBuilder(app, SearchItemDatabase::class.java, "search_database")
             .fallbackToDestructiveMigration()
             .build()
+
+    @Provides
+    @Singleton
+    fun provideCalendar(app: Application): Calendar = Calendar.getInstance()
 }
