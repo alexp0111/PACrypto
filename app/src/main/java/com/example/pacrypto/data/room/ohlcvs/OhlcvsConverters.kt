@@ -5,6 +5,9 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import java.lang.reflect.Type
 
+/**
+ * Converters that are necessary for recognizing ohlcvs
+ * */
 class OhlcvsConverters {
     @TypeConverter
     fun jsonToList(value: String?): List<List<DBOhlcvsItem>> {

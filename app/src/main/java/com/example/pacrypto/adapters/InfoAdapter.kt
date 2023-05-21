@@ -1,30 +1,25 @@
 package com.example.pacrypto.adapters
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
-import com.example.pacrypto.R
-import com.example.pacrypto.data.room.ohlcvs.DBOhlcvsItem
 import com.example.pacrypto.databinding.ItemInfoBinding
+import com.example.pacrypto.util.OhlcvsInfo
+import com.example.pacrypto.util.Rates
 
-
+/**
+ * RecyclerView adapter, that shows info in form of OHLCV (Open, High, Low, Close, Volume)
+ * Have 2 lists - first for constant text info & second - for actual values
+ * */
 class InfoAdapter(
     val context: Context,
 ) : RecyclerView.Adapter<InfoAdapter.MyViewHolder>() {
 
-    private var params = arrayListOf(
-        "Цена на старте",
-        "Самая высокая цена",
-        "Самая низкая цена",
-        "Цена на закрытии",
-        "В общем\nопераций на",
-        "Всего сделок"
-    )
+    private var params = OhlcvsInfo(context).parameters
     private var list: ArrayList<Double> = arrayListOf()
-    private var rateMarker: String = "$"
+    private var rateMarker: String = Rates.USD_MARKER
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -41,6 +36,7 @@ class InfoAdapter(
         holder.bind(param, item)
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     fun updateList(list: List<Double>, marker: String) {
         this.list = ArrayList(list)
         this.rateMarker = marker

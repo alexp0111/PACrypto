@@ -4,6 +4,10 @@ import com.example.pacrypto.data.api_data.ApiAsset
 import com.example.pacrypto.data.api_data.ApiListRates
 import kotlin.math.abs
 
+
+/**
+ * Converter that transform few lists of info two one list of search items
+ * */
 object SearchItemConverter {
 
 

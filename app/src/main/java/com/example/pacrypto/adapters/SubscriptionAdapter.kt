@@ -1,7 +1,7 @@
 package com.example.pacrypto.adapters
 
+import android.annotation.SuppressLint
 import android.content.Context
-import android.content.res.Resources.Theme
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
@@ -11,11 +11,17 @@ import com.example.pacrypto.data.worker.SubItem
 import com.example.pacrypto.databinding.ItemSubscriptionBinding
 import com.example.pacrypto.util.toCalendarConstant
 
+/**
+ * RecyclerView adapter, that show info about user's actual subscriptions
+ *
+ * Provide functions for deleting sub, changing time of sub & set days of the week,
+ *  when user want to be notified
+ * */
 class SubscriptionAdapter(
     val context: Context,
     val onDeleteClicked: (Int, SubItem) -> Unit,
     val onTimeClicked: (Int, SubItem) -> Unit,
-    val onWeekClicked: (Int, SubItem, Int, Boolean) -> Unit,
+    val onWeekClicked: (Int, SubItem, Int) -> Unit,
 ) : RecyclerView.Adapter<SubscriptionAdapter.MyViewHolder>() {
 
     private var list: ArrayList<SubItem> = arrayListOf()
@@ -34,6 +40,7 @@ class SubscriptionAdapter(
         holder.bind(item)
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     fun updateList(list: List<SubItem>) {
         this.list = ArrayList(list)
         notifyDataSetChanged()
@@ -48,7 +55,6 @@ class SubscriptionAdapter(
         fun bind(item: SubItem) {
             binding.apply {
                 // viewing info
-
                 tvTicker.text = item.ticker
                 tvTime.text = item.time
 
@@ -60,8 +66,10 @@ class SubscriptionAdapter(
                         item
                     )
                 }
+
                 val weekPicker =
                     arrayListOf(tvWeek1, tvWeek2, tvWeek3, tvWeek4, tvWeek5, tvWeek6, tvWeek7)
+
                 weekPicker.forEachIndexed { index, textView ->
                     if (index.toCalendarConstant() !in item.weekDay){
                         textView.setTextColor(ContextCompat.getColor(context, R.color.color_off))
@@ -74,8 +82,7 @@ class SubscriptionAdapter(
                         onWeekClicked.invoke(
                             absoluteAdapterPosition,
                             item,
-                            index,
-                            textView.currentTextColor == ContextCompat.getColor(context, R.color.color_on)
+                            index
                         )
                     }
                 }

@@ -8,6 +8,11 @@ import retrofit2.http.Headers
 import retrofit2.http.Path
 import retrofit2.http.Query
 
+/**
+ * Interface that holds all operations connected to api requests
+ *
+ * API_KEY_RESERVED is used to circumvent restrictions of free access plan
+ * */
 interface CoinApi {
 
     companion object {
@@ -16,29 +21,29 @@ interface CoinApi {
         const val API_KEY_RESERVED = "F4D66C7B-04A8-4715-9F14-A15074A4F322"
     }
 
-    @Headers("X-CoinAPI-Key: $API_KEY")
+    @Headers("X-CoinAPI-Key: $API_KEY_RESERVED")
     @GET("assets")
     suspend fun getAssets(): List<ApiAsset>
 
-    @Headers("X-CoinAPI-Key: $API_KEY")
+    @Headers("X-CoinAPI-Key: $API_KEY_RESERVED")
     @GET("assets/{asset_id}")
     suspend fun getExactAsset(
         @Path("asset_id") id: String
     ): List<ApiAsset>
 
-    @Headers("X-CoinAPI-Key: $API_KEY")
+    @Headers("X-CoinAPI-Key: $API_KEY_RESERVED")
     @GET("exchangerate/USD")
     suspend fun getUSDRates(
         @Query("time") time: String
     ): ApiListRates
 
-    @Headers("X-CoinAPI-Key: $API_KEY")
+    @Headers("X-CoinAPI-Key: $API_KEY_RESERVED")
     @GET("exchangerate/RUB")
     suspend fun getRUBRates(
         @Query("time") time: String
     ): ApiListRates
 
-    @Headers("X-CoinAPI-Key: $API_KEY")
+    @Headers("X-CoinAPI-Key: $API_KEY_RESERVED")
     @GET("ohlcv/{symbol_id}/latest")
     suspend fun getOhlcvs(
         @Path("symbol_id") id: String,
@@ -46,7 +51,7 @@ interface CoinApi {
         @Query("limit") limit: Int,
     ): List<ApiOhlcv>
 
-    @Headers("X-CoinAPI-Key: $API_KEY")
+    @Headers("X-CoinAPI-Key: $API_KEY_RESERVED")
     @GET("ohlcv/{symbol_id}/latest")
     suspend fun getOhlcvs(
         @Path("symbol_id") id: String,

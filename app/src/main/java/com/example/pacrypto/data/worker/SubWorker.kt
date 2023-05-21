@@ -5,25 +5,26 @@ import android.content.Context
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat.getSystemService
 import androidx.hilt.work.HiltWorker
-import androidx.work.*
+import androidx.work.CoroutineWorker
+import androidx.work.WorkerParameters
 import com.example.pacrypto.R
 import com.example.pacrypto.api.CoinApi
+import com.example.pacrypto.util.Rates
 import com.example.pacrypto.util.Sub
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.time.DayOfWeek
-import java.time.Duration
-import java.time.Instant
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.ZoneOffset
-import java.time.temporal.TemporalField
 import java.util.*
-import java.util.concurrent.TimeUnit
 import kotlin.random.Random
 
+/**
+ * Worker that used to generate notifications
+ *
+ * First of worker create the request to api
+ * and then provides the result of to notification channel
+ *
+ * */
 @HiltWorker
 class SubWorker @AssistedInject constructor(
     @Assisted private val context: Context,
@@ -46,10 +47,15 @@ class SubWorker @AssistedInject constructor(
         return Result.success()
     }
 
-    private suspend fun startForegroundService(ticker: String, name: String, value: Double) {
-        val notification = NotificationCompat.Builder(context, "sub_channel")
+    private fun startForegroundService(ticker: String, name: String, value: Double) {
+        val notification = NotificationCompat.Builder(context, Sub.CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_notification)
-            .setContentText("$name price is: ${String.format("%.2f", value)}$")
+            .setContentText(buildString {
+                append(name)
+                append(Sub(context).MESSAGE)
+                append(String.format("%.2f", value))
+                append(Rates.USD_MARKER)
+            })
             .setContentTitle(ticker)
 
         val notificationManager = getSystemService(context, NotificationManager::class.java)

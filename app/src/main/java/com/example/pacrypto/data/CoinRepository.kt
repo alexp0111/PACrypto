@@ -1,19 +1,22 @@
 package com.example.pacrypto.data
 
-import android.util.Log
 import androidx.room.withTransaction
 import com.example.pacrypto.api.CoinApi
 import com.example.pacrypto.data.room.ohlcvs.OhlcvsDatabase
 import com.example.pacrypto.data.room.search_items.SearchItemDatabase
-import com.example.pacrypto.util.SearchType
-import com.example.pacrypto.util.UiState
-import com.example.pacrypto.util.asDBType
-import com.example.pacrypto.util.networkBoundResource
+import com.example.pacrypto.util.*
 import kotlinx.coroutines.flow.channelFlow
 import javax.inject.Inject
 
-private const val TAG = "COIN_REPOSITORY"
 
+/**
+ *
+ * Repository of MVVM architecture that holds operations connected to data
+ *
+ * if request is connected with api and should pe stored - networkBoundResource called
+ * otherwise - it is the simple request to database transferred to channelFlow
+ *
+ * */
 class CoinRepository @Inject constructor(
     private val api: CoinApi,
     private val db_search_item: SearchItemDatabase,
@@ -42,9 +45,6 @@ class CoinRepository @Inject constructor(
             )
         },
         saveFetchResult = { searchItems ->
-            searchItems.forEach {
-                Log.d(TAG, it.toString())
-            }
             db_search_item.withTransaction {
                 searchDao.deleteAllSearchItems()
                 searchDao.insertSearchItems(searchItems)
@@ -71,12 +71,12 @@ class CoinRepository @Inject constructor(
             ohlcvsDao.getOhlcvs(id)
         },
         fetch = {
-            val ohlcvsDay = api.getOhlcvs(id, "1HRS", 24)
-            val ohlcvsWeek = api.getOhlcvs(id, "2HRS", 84)
-            val ohlcvsMonth = api.getOhlcvs(id, "8HRS", 90)
-            val ohlcvsQuarter = api.getOhlcvs(id, "1DAY", 90)
-            val ohlcvsYear = api.getOhlcvs(id, "5DAY", 73)
-            val ohlcvsAll = api.getOhlcvs(id, "1MTH")
+            val ohlcvsDay = api.getOhlcvs(id, OhlcvsInfo.PERIOD_ID_1HRS, OhlcvsInfo.PERIOD_LIMIT_1HRS)
+            val ohlcvsWeek = api.getOhlcvs(id, OhlcvsInfo.PERIOD_ID_2HRS, OhlcvsInfo.PERIOD_LIMIT_2HRS)
+            val ohlcvsMonth = api.getOhlcvs(id, OhlcvsInfo.PERIOD_ID_8HRS, OhlcvsInfo.PERIOD_LIMIT_8HRS)
+            val ohlcvsQuarter = api.getOhlcvs(id, OhlcvsInfo.PERIOD_ID_1DAY, OhlcvsInfo.PERIOD_LIMIT_1DAY)
+            val ohlcvsYear = api.getOhlcvs(id, OhlcvsInfo.PERIOD_ID_5DAY, OhlcvsInfo.PERIOD_LIMIT_5DAY)
+            val ohlcvsAll = api.getOhlcvs(id, OhlcvsInfo.PERIOD_ID_1MTH)
 
             return@networkBoundResource listOf(
                 ohlcvsDay,

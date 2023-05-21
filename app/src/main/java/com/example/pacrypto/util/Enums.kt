@@ -1,9 +1,8 @@
 package com.example.pacrypto.util
 
-enum class FabState {
-    SHOW, HIDE
-}
-
+/**
+ * Used while searching
+ * */
 enum class SearchType {
     TICKER, NAME
 }

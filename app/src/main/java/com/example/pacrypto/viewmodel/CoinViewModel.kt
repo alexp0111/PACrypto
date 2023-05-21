@@ -3,8 +3,10 @@ package com.example.pacrypto.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.pacrypto.data.CoinRepository
+import com.example.pacrypto.util.DatePattern
 import com.example.pacrypto.util.SearchType
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.flatMapLatest
@@ -15,11 +17,18 @@ import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
 
-private const val TAG = "COIN_VIEW_MODEL"
-
+/**
+ * ViewModel for searchItem info
+ *
+ * Uses channel logic: each request is just a message to channel,
+ * that handle them in it's own way
+ *
+ * (flatMapLatest) helps to cancel previous work when new message in channel received
+ * */
+@OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class CoinViewModel @Inject constructor(
-    val repository: CoinRepository
+    private val repository: CoinRepository
 ) : ViewModel() {
 
     private val refreshTriggerChannelForSearchItems = Channel<Pair<String, String>>()
@@ -53,7 +62,7 @@ class CoinViewModel @Inject constructor(
 
     fun refreshAllData() {
         viewModelScope.launch {
-            val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS", Locale.getDefault())
+            val sdf = SimpleDateFormat(DatePattern.FULL_INFO, Locale.getDefault())
             val c = Calendar.getInstance()
             val timeActual = c.time
             c.add(Calendar.DATE, -1)

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="removed_from_bookmarks">Убрано из закладок</string>
+    <string name="restore">Восстановить</string>
+    <string name="course_alert">Оповещение о курсе</string>
+    <string name="price_is">\" оценивается в: \"</string>
+    <string name="failed_to_load_data">Не удалось загрузить данные</string>
+    <string name="data_could_not_be_updated">Данные не удалось обновить</string>
+    <string name="unable_to_add_subscription">Невозможно добавить подписку</string>
+    <string name="unable_to_unsubscribe">Невозможно убрать подписку</string>
+    <string name="unable_to_add_to_favorites">Невозможно добавить в избранное</string>
+    <string name="unable_to_remove_from_favorites">Невозможно убрать из избранного</string>
+    <string name="аailed_to_search">Не удалось совершить поиск</string>
+    <string name="no_data">Нет данных</string>
+    <string name="day">24ч</string>
+    <string name="week">7д</string>
+    <string name="month">1м</string>
+    <string name="quorter">3м</string>
+    <string name="year">1г</string>
+    <string name="all">Все</string>
+    <string name="not_correct_qr">Кажется, данный QR-код не корректен</string>
+    <string name="unrecognizable_qr">Код не может быть распознан данным приложением</string>
+    <string name="search">Найти…</string>
+    <string name="updating">Обновляем данные</string>
+    <string name="bookmarks">Закладки</string>
+    <string name="on_request">По запросу</string>
+    <string name="na_nme">ИМЯ</string>
+    <string name="tic_nker">ТИ\nКЕР</string>
+    <string name="information">Информация</string>
+    <string name="qr_fr_hint">Наведите камеру на QR-код с иконкой необходимой криптовалюты для получения информации о ней</string>
+    <string name="subscriptions">Уведомления</string>
+    <string name="per_day">за день</string>
+    <string name="MO">ПН</string>
+    <string name="TU">ВТ</string>
+    <string name="WE">СР</string>
+    <string name="TH">ЧТ</string>
+    <string name="FR">ПТ</string>
+    <string name="SA">СБ</string>
+    <string name="SU">ВС</string>
+    <string-array name="ohlcvs_info">
+        <item>"Цена на старте"</item>
+        <item>"Самая высокая цена"</item>
+        <item>"Самая низкая цена"</item>
+        <item>"Цена на закрытии"</item>
+        <item>"В общем\nопераций на"</item>
+        <item>"Всего сделок"</item>
+    </string-array>
+</resources>

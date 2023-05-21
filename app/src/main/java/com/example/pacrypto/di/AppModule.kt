@@ -5,6 +5,7 @@ import androidx.room.Room
 import com.example.pacrypto.api.CoinApi
 import com.example.pacrypto.data.room.ohlcvs.OhlcvsDatabase
 import com.example.pacrypto.data.room.search_items.SearchItemDatabase
+import com.example.pacrypto.util.DatabaseNames
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -33,18 +34,18 @@ object AppModule {
     @Provides
     @Singleton
     fun provideOhlcvsDatabase(app: Application): OhlcvsDatabase =
-        Room.databaseBuilder(app, OhlcvsDatabase::class.java, "ohlcvs_database")
+        Room.databaseBuilder(app, OhlcvsDatabase::class.java, DatabaseNames.OHLCVS_NAME)
             .fallbackToDestructiveMigration()
             .build()
 
     @Provides
     @Singleton
     fun provideSearchItemDatabase(app: Application): SearchItemDatabase =
-        Room.databaseBuilder(app, SearchItemDatabase::class.java, "search_database")
+        Room.databaseBuilder(app, SearchItemDatabase::class.java, DatabaseNames.SEARCH_NAME)
             .fallbackToDestructiveMigration()
             .build()
 
     @Provides
     @Singleton
-    fun provideCalendar(app: Application): Calendar = Calendar.getInstance()
+    fun provideCalendar(): Calendar = Calendar.getInstance()
 }

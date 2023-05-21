@@ -1,6 +1,10 @@
 package com.example.pacrypto.data.api_data
 
-
+/**
+ * Contains info about asset, that API provides
+ *
+ * asset_id is unique and stands for ticker in coins
+ * */
 data class ApiAsset(
     val asset_id: String,
     val data_end: String,

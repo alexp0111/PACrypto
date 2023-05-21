@@ -1,6 +1,5 @@
 package com.example.pacrypto.ui
 
-import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.view.View
 import android.widget.TextView
@@ -28,9 +27,9 @@ import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 
-
-private const val TAG = "HOME_FRAGMENT"
-
+/**
+ * Main fragment that is used to display bookmarks & provide search mechanic
+ * */
 @AndroidEntryPoint
 class HomeFragment : Fragment(R.layout.fragment_home) {
 
@@ -42,14 +41,13 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     private var currencyPicker = mutableMapOf<ConstraintLayout, TextView>()
     private var fabAnimJob: Job? = null
 
-    private var fabState = FabState.HIDE
     private var searchType = SearchType.TICKER
     private var searchRate = SearchRate.USD
 
     val coinAdapter by lazy {
         CoinAdapter(
             requireContext(),
-            onItemClicked = { pos, item ->
+            onItemClicked = { _, item ->
                 val fragment = InfoFragment()
                 val bundle = Bundle()
                 bundle.putString("ticker", item.ticker)
@@ -60,11 +58,6 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                     .replace(R.id.container_main, fragment).commit()
             }
         )
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -82,12 +75,12 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
             currencyPicker[picker2] = pickerText2
 
             PickerAnimator {
-                if (it == "$") {
+                if (it == Rates.USD_MARKER) {
                     searchRate = SearchRate.USD
-                    coinAdapter.setRateMarker("$")
+                    coinAdapter.setRateMarker(Rates.USD_MARKER)
                 } else {
                     searchRate = SearchRate.RUB
-                    coinAdapter.setRateMarker("₽")
+                    coinAdapter.setRateMarker(Rates.RUB_MARKER)
                 }
             }.animate(resources, context, currencyPicker, pickerCircle)
         }
@@ -136,6 +129,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                 .addToBackStack(null).commit()
         }
 
+
         // qr code scanning
         binding.ivQr.setOnClickListener {
             parentFragmentManager.beginTransaction()
@@ -160,12 +154,12 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 if (direction == ItemTouchHelper.RIGHT) {
                     val tickerToDelete =
-                        searchItemList.get(viewHolder.absoluteAdapterPosition).ticker
+                        searchItemList[viewHolder.absoluteAdapterPosition].ticker
                     removeFavItemFromSP(requireActivity(), tickerToDelete)
                     coinAdapter.deleteItem(viewHolder.absoluteAdapterPosition)
 
-                    Snackbar.make(requireView(), "Убрано из закладок", Snackbar.LENGTH_LONG)
-                        .setAction("Восстановить") {
+                    Snackbar.make(requireView(), Prefs(requireContext()).MESSAGE_DELETED, Snackbar.LENGTH_LONG)
+                        .setAction(Prefs(requireContext()).MESSAGE_RESTORE) {
                             addFavItemToSP(requireActivity(), tickerToDelete)
                             viewModel.getFavouriteList(getAllFavItemsInSP(requireActivity()))
                         }.show()
@@ -180,9 +174,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         binding.apply {
             etSearch.addTextChangedListener {
                 if (etSearch.text.isNullOrEmpty()) {
-                    fabState = FabState.HIDE
-                    fabRefresh.hide()
-                    tvHeader.text = "Закладки"
+                    tvHeader.text = Headers(requireContext()).BOOKMARKS
 
                     tvName.visibility = View.GONE
                     tvTicker.visibility = View.GONE
@@ -193,9 +185,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
                     viewModel.getFavouriteList(getAllFavItemsInSP(requireActivity()))
                 } else {
-                    fabState = FabState.SHOW
-                    fabRefresh.show()
-                    tvHeader.text = "По запросу"
+                    tvHeader.text = Headers(requireContext()).RESULTS
 
                     tvName.visibility = View.VISIBLE
                     tvTicker.visibility = View.VISIBLE
@@ -209,23 +199,24 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
             }
         }
 
+
         // Handle fab visibility while scrolling
         binding.rv.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                if (dy > 0 || dy < 0 && binding.fabRefresh.isShown()) {
+                if (dy > 0 || dy < 0 && binding.fabRefresh.isShown) {
                     fabAnimJob?.cancel()
                     binding.fabRefresh.hide()
                 }
             }
 
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-                if (fabState == FabState.SHOW && newState == RecyclerView.SCROLL_STATE_IDLE) {
+                if (newState == RecyclerView.SCROLL_STATE_IDLE) {
                     fabAnimJob?.cancel()
                     fabAnimJob = CoroutineScope(Dispatchers.Main).launch {
                         delay(AnimationDelays.FABDelay)
                         binding.fabRefresh.show()
                     }
-                } else if (fabState == FabState.SHOW && newState == RecyclerView.SCROLL_STATE_SETTLING) {
+                } else if (newState == RecyclerView.SCROLL_STATE_SETTLING) {
                     binding.fabRefresh.show()
                 }
                 super.onScrollStateChanged(recyclerView, newState)
@@ -236,7 +227,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     override fun onStart() {
         super.onStart()
         viewModel.getFavouriteList(getAllFavItemsInSP(requireActivity()))
-        // viewModel.refreshAllData()
+        viewModel.refreshAllData()
     }
 
     private fun observers(binding: FragmentHomeBinding) {
@@ -247,16 +238,16 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                     if (it is UiState.Success && it.data != null) {
                         searchItemList = it.data as ArrayList<SearchItem>
                         if (searchRate == SearchRate.USD) {
-                            coinAdapter.setRateMarker("$")
+                            coinAdapter.setRateMarker(Rates.USD_MARKER)
                         } else {
-                            coinAdapter.setRateMarker("₽")
+                            coinAdapter.setRateMarker(Rates.RUB_MARKER)
                         }
                         coinAdapter.updateList(searchItemList)
                     }
                     if (it is UiState.Failure) {
                         Toast.makeText(
                             requireContext(),
-                            "Не удалось совершить поиск",
+                            Errors(requireContext()).IMPOSSIBLE_TO_SEARCH,
                             Toast.LENGTH_SHORT
                         ).show()
                     }
@@ -285,16 +276,16 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                     if (it is UiState.Success && it.data != null) {
                         searchItemList = it.data as ArrayList<SearchItem>
                         if (searchRate == SearchRate.USD) {
-                            coinAdapter.setRateMarker("$")
+                            coinAdapter.setRateMarker(Rates.USD_MARKER)
                         } else {
-                            coinAdapter.setRateMarker("₽")
+                            coinAdapter.setRateMarker(Rates.RUB_MARKER)
                         }
                         coinAdapter.updateList(searchItemList)
                     }
                     if (it is UiState.Failure) {
                         Toast.makeText(
                             requireContext(),
-                            "Не удалось совершить поиск",
+                            Errors(requireContext()).IMPOSSIBLE_TO_SEARCH,
                             Toast.LENGTH_SHORT
                         ).show()
                     }
@@ -305,34 +296,33 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
     private fun showLoadingInfo(binding: FragmentHomeBinding) {
         if (binding.etSearch.text.isNullOrEmpty()) {
-            binding.etSearch.hint = "Обновляем данные"
+            binding.etSearch.hint = Hints(requireContext()).UPDATING
         }
-        binding.etSearch.isEnabled = false
         binding.fabRefresh.isEnabled = false
+        binding.etSearch.isEnabled = false
         binding.pb.visibility = View.VISIBLE
     }
 
     private fun showSuccessInfo(binding: FragmentHomeBinding) {
         if (binding.etSearch.text.isNullOrEmpty()) {
-            binding.etSearch.hint = "Найти..."
+            binding.etSearch.hint = Hints(requireContext()).SEARCH
         }
-        binding.etSearch.isEnabled = true
         binding.fabRefresh.isEnabled = true
+        binding.etSearch.isEnabled = true
         binding.pb.visibility = View.GONE
     }
 
     private fun showFailureInfo(binding: FragmentHomeBinding) {
         if (binding.etSearch.text.isNullOrEmpty()) {
-            binding.etSearch.hint = "Найти..."
+            binding.etSearch.hint = Hints(requireContext()).SEARCH
         }
-        binding.etSearch.isEnabled = true
         binding.fabRefresh.isEnabled = true
-
+        binding.etSearch.isEnabled = true
         binding.pb.visibility = View.GONE
 
         Toast.makeText(
             requireContext(),
-            "Данные не удалось обновить",
+            Errors(requireContext()).IMPOSSIBLE_TO_UPDATE,
             Toast.LENGTH_SHORT
         ).show()
     }

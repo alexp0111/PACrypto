@@ -9,8 +9,13 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import com.example.pacrypto.R
 import com.example.pacrypto.databinding.FragmentQRCodeBinding
+import com.example.pacrypto.util.QRInfo
 import com.google.zxing.integration.android.IntentIntegrator
 
+/**
+ * Simple fragment that launch camera activity
+ *  and redirects to info page if result is successful
+ * */
 class QRCodeFragment : Fragment(R.layout.fragment_q_r_code) {
 
     private var fragmentQRCodeBinding: FragmentQRCodeBinding? = null
@@ -34,18 +39,19 @@ class QRCodeFragment : Fragment(R.layout.fragment_q_r_code) {
         super.onDestroy()
     }
 
-    var resultLauncher =
+    private var resultLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
-                // There are no request codes
                 val data: Intent? = result.data
                 if (data != null) {
-                    val result = IntentIntegrator.parseActivityResult(result.resultCode, data)
-                    val text = result.contents
-                    if (text != null && text.matches(Regex("[A-Za-z]+://[A-Za-z]+\\.[A-Za-z]+/[A-Za-z]+/[A-Za-z]+"))) {
+                    val text = IntentIntegrator.parseActivityResult(result.resultCode, data).contents
+                    if (text != null && text.matches(Regex(QRInfo().REGEX))) {
                         val fragment = InfoFragment()
                         val bundle = Bundle()
-                        bundle.putString("ticker", text.substringBeforeLast('/').substringAfterLast('/'))
+                        bundle.putString(
+                            "ticker",
+                            text.substringBeforeLast('/').substringAfterLast('/')
+                        )
                         bundle.putString("name", text.substringAfterLast('/'))
                         fragment.arguments = bundle
 
@@ -54,14 +60,14 @@ class QRCodeFragment : Fragment(R.layout.fragment_q_r_code) {
                     } else {
                         Toast.makeText(
                             requireContext(),
-                            "Кажется, данный QR-код не корректен",
+                            QRInfo(requireContext()).IMPOSSIBLE_TO_READ_ERROR,
                             Toast.LENGTH_SHORT
                         ).show()
                     }
                 } else {
                     Toast.makeText(
                         requireContext(),
-                        "Мы не можем распознать этот код",
+                        QRInfo(requireContext()).NOT_MATCHES_ERROR,
                         Toast.LENGTH_SHORT
                     ).show()
                 }

@@ -6,9 +6,15 @@ import android.app.NotificationManager
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
 import androidx.work.WorkManager
+import com.example.pacrypto.util.Sub
 import dagger.hilt.android.HiltAndroidApp
 import javax.inject.Inject
 
+/**
+ * Entrance point
+ *
+ * Used to init notification channel & workManager
+ * */
 @HiltAndroidApp
 class PACryptoAppliaction : Application() {
 
@@ -19,8 +25,8 @@ class PACryptoAppliaction : Application() {
         super.onCreate()
 
         val channel = NotificationChannel(
-            "sub_channel",
-            "Оповещение о курсе",
+            Sub.CHANNEL_ID,
+            Sub(applicationContext).CHANNEL_NAME,
             NotificationManager.IMPORTANCE_HIGH
         )
 

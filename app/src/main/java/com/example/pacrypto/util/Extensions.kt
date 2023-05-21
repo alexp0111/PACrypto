@@ -1,5 +1,6 @@
 package com.example.pacrypto.util
 
+import android.content.Context
 import com.example.pacrypto.data.api_data.ApiOhlcv
 import com.example.pacrypto.data.room.ohlcvs.DBOhlcvs
 import com.example.pacrypto.data.room.ohlcvs.DBOhlcvsItem
@@ -51,5 +52,17 @@ fun Int.toCalendarConstant(): Int {
         5 -> Calendar.SATURDAY
         6 -> Calendar.SUNDAY
         else -> Calendar.MONDAY
+    }
+}
+
+fun String.toIndex(context: Context): Int {
+    return when (this) {
+        DatePickerValues(context).DAY -> 0
+        DatePickerValues(context).WEEK-> 1
+        DatePickerValues(context).MONTH-> 2
+        DatePickerValues(context).QUARTER-> 3
+        DatePickerValues(context).YEAR-> 4
+        DatePickerValues(context).ALL -> 5
+        else -> 0
     }
 }

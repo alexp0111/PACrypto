@@ -3,12 +3,12 @@ package com.example.pacrypto.ui
 import android.app.TimePickerDialog
 import android.graphics.Color
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.TextView
 import android.widget.TimePicker
 import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -22,7 +22,6 @@ import com.example.pacrypto.adapters.InfoAdapter
 import com.example.pacrypto.animator.PickerAnimator
 import com.example.pacrypto.data.room.ohlcvs.DBOhlcvsItem
 import com.example.pacrypto.data.worker.SubItem
-import com.example.pacrypto.data.worker.SubWorker
 import com.example.pacrypto.data.worker.setUpSubscription
 import com.example.pacrypto.databinding.FragmentInfoBinding
 import com.example.pacrypto.util.*
@@ -30,13 +29,14 @@ import com.example.pacrypto.viewmodel.OhlcvsViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
-import java.time.Duration
 import java.util.*
-import java.util.concurrent.TimeUnit
 
-
-private const val TAG = "INFO_FRAGMENT"
-
+/**
+ * Fragment that shows charts for coin & ohlcvs info
+ *
+ * It is also responsible for adding\removing coin to bookmarks
+ *  and setting up\removing subscriptions
+ * */
 @AndroidEntryPoint
 class InfoFragment : Fragment(R.layout.fragment_info), TimePickerDialog.OnTimeSetListener {
 
@@ -51,9 +51,9 @@ class InfoFragment : Fragment(R.layout.fragment_info), TimePickerDialog.OnTimeSe
     private var name: String = ""
     private var ticker: String = ""
 
-    private var currency: String = "$"
+    private var currency: String = Rates.USD_MARKER
 
-    val adapter by lazy {
+    private val adapter by lazy {
         InfoAdapter(requireContext())
     }
 
@@ -66,10 +66,10 @@ class InfoFragment : Fragment(R.layout.fragment_info), TimePickerDialog.OnTimeSe
         //set up observers
         observers(binding)
 
+
         // Arguments
         name = arguments?.getString("name") ?: ""
         ticker = arguments?.getString("ticker") ?: ""
-
         binding.tvHeader.text = name
 
 
@@ -80,11 +80,13 @@ class InfoFragment : Fragment(R.layout.fragment_info), TimePickerDialog.OnTimeSe
             setFavouriteVisibility(false, binding)
         }
 
+        // Check if subscribed
         if (isSubItemInSP(requireActivity(), ticker)) {
             setSubVisibility(true, binding)
         } else {
             setSubVisibility(false, binding)
         }
+
 
         // Picker rate
         binding.apply {
@@ -92,10 +94,10 @@ class InfoFragment : Fragment(R.layout.fragment_info), TimePickerDialog.OnTimeSe
             currencyPicker[currencyPicker2] = currencyPickerText2
 
             PickerAnimator {
-                if (it == "$") {
-                    viewModel.getExactOhlcvs(ticker, "USD", false)
+                if (it == Rates.USD_MARKER) {
+                    viewModel.getExactOhlcvs(ticker, Rates.USD, false)
                 } else {
-                    viewModel.getExactOhlcvs(ticker, "RUB", false)
+                    viewModel.getExactOhlcvs(ticker, Rates.RUB, false)
                 }
             }.animate(resources, context, currencyPicker, pickerCurrencyCircle)
         }
@@ -112,15 +114,7 @@ class InfoFragment : Fragment(R.layout.fragment_info), TimePickerDialog.OnTimeSe
 
             PickerAnimator {
                 if (dataList != null) {
-                    val i = when (it) {
-                        "24h" -> 0
-                        "7d" -> 1
-                        "1m" -> 2
-                        "3m" -> 3
-                        "1y" -> 4
-                        "All" -> 5
-                        else -> 0
-                    }
+                    val i = it.toIndex(requireContext())
 
                     val currentList = dataList!![i].asPairedList()
                     binding.lineChart.animate(currentList.asReversed())
@@ -155,7 +149,7 @@ class InfoFragment : Fragment(R.layout.fragment_info), TimePickerDialog.OnTimeSe
         binding.apply {
             lineChart.gradientFillColors =
                 intArrayOf(
-                    resources.getColor(R.color.main_text_color),
+                    ContextCompat.getColor(requireContext(), R.color.main_text_color),
                     Color.TRANSPARENT
                 )
             lineChart.animation.duration = animationDuration
@@ -169,24 +163,28 @@ class InfoFragment : Fragment(R.layout.fragment_info), TimePickerDialog.OnTimeSe
         binding.rv.adapter = adapter
         binding.rv.isNestedScrollingEnabled = false
 
+        // Add to favourite
         binding.ivFavFalse.setOnClickListener {
             try {
                 addFavItemToSP(requireActivity(), ticker)
                 setFavouriteVisibility(true, binding)
             } catch (e: java.lang.Exception) {
-                Toast.makeText(requireContext(), "Error", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), Errors(requireContext()).IMPOSSIBLE_TO_FAVOURITE, Toast.LENGTH_SHORT).show()
             }
         }
 
+
+        // Remove from favourite
         binding.ivFavTrue.setOnClickListener {
             try {
                 removeFavItemFromSP(requireActivity(), ticker)
                 setFavouriteVisibility(false, binding)
             } catch (e: java.lang.Exception) {
-                Toast.makeText(requireContext(), "Error", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), Errors(requireContext()).IMPOSSIBLE_TO_UNFAVOURITE, Toast.LENGTH_SHORT).show()
             }
         }
 
+        // New sub
         binding.ivSubFalse.setOnClickListener {
             try {
                 TimePickerDialog(
@@ -199,10 +197,11 @@ class InfoFragment : Fragment(R.layout.fragment_info), TimePickerDialog.OnTimeSe
 
                 setSubVisibility(true, binding)
             } catch (e: java.lang.Exception) {
-                Toast.makeText(requireContext(), "Error", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(),  Errors(requireContext()).IMPOSSIBLE_TO_SUBSCRIBE, Toast.LENGTH_SHORT).show()
             }
         }
 
+        // Remove sub
         binding.ivSubTrue.setOnClickListener {
             try {
                 val uuid = removeSubItemFromSP(requireActivity(), ticker)
@@ -210,7 +209,7 @@ class InfoFragment : Fragment(R.layout.fragment_info), TimePickerDialog.OnTimeSe
                 workManager.cancelWorkById(uuid)
                 setSubVisibility(false, binding)
             } catch (e: java.lang.Exception) {
-                Toast.makeText(requireContext(), "Error", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), Errors(requireContext()).IMPOSSIBLE_TO_UNSUBSCRIBE, Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -237,7 +236,7 @@ class InfoFragment : Fragment(R.layout.fragment_info), TimePickerDialog.OnTimeSe
 
     override fun onStart() {
         super.onStart()
-        viewModel.getExactOhlcvs(ticker, "USD")
+        viewModel.getExactOhlcvs(ticker, Rates.USD)
     }
 
     private fun observers(binding: FragmentInfoBinding) {
@@ -255,7 +254,7 @@ class InfoFragment : Fragment(R.layout.fragment_info), TimePickerDialog.OnTimeSe
                                 infoList = getInfo(it.data.periods)
                                 binding.lineChart.visibility = View.VISIBLE
                                 binding.picker1.performClick()
-                                currency = if (it.data.type.endsWith("USD")) "$" else "₽"
+                                currency = if (it.data.type.endsWith(Rates.USD)) Rates.USD_MARKER else Rates.RUB_MARKER
                                 adapter.updateList(infoList!![0].asDoubleList(), currency)
                             }
                             binding.pb.visibility = View.GONE
@@ -266,18 +265,17 @@ class InfoFragment : Fragment(R.layout.fragment_info), TimePickerDialog.OnTimeSe
                                 infoList = getInfo(it.data.periods)
                                 binding.lineChart.visibility = View.VISIBLE
                                 binding.picker1.performClick()
-                                currency = if (it.data.type.endsWith("USD")) "$" else "₽"
+                                currency = if (it.data.type.endsWith(Rates.USD)) Rates.USD_MARKER else Rates.RUB_MARKER
                                 adapter.updateList(infoList!![0].asDoubleList(), currency)
                             }
                             Toast.makeText(
                                 requireContext(),
-                                "Не удалось загрузить данные",
+                                Errors(requireContext()).IMPOSSIBLE_TO_DOWNLOAD,
                                 Toast.LENGTH_SHORT
                             ).show()
                             binding.pb.visibility = View.GONE
                         }
                         else -> {
-                            Log.d(TAG, "Error")
                             binding.pb.visibility = View.GONE
                             binding.lineChart.visibility = View.GONE
                         }
@@ -324,18 +322,18 @@ class InfoFragment : Fragment(R.layout.fragment_info), TimePickerDialog.OnTimeSe
         val time = calendar.time
 
         val item = SubItem(
-            ticker =  ticker,
-            time =  SimpleDateFormat("HH:mm").format(time),
-            uuid =  UUID.randomUUID()
+            ticker = ticker,
+            time = SimpleDateFormat(DatePattern.TIME_ONLY, Locale.getDefault()).format(time),
+            uuid = UUID.randomUUID()
         )
         val uuid = setUpSubscription(calendar, item, requireContext())
 
         addSubItemToSP(
             requireActivity(),
             SubItem(
-                ticker =  ticker,
-                time =  SimpleDateFormat("HH:mm").format(time),
-                uuid =  uuid
+                ticker = ticker,
+                time = SimpleDateFormat(DatePattern.TIME_ONLY, Locale.getDefault()).format(time),
+                uuid = uuid
             )
         )
     }

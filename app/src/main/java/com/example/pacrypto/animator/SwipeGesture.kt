@@ -8,7 +8,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.pacrypto.R
 import it.xabaras.android.recyclerview.swipedecorator.RecyclerViewSwipeDecorator
 
-
+/**
+ * Class that allows recyclerView to handle horizontal swipes on items for deletion
+ * */
 abstract class SwipeGesture(val context: Context) :
     ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT) {
 
@@ -21,10 +23,6 @@ abstract class SwipeGesture(val context: Context) :
         target: RecyclerView.ViewHolder
     ): Boolean {
         return false
-    }
-
-    override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-        TODO("Not yet implemented")
     }
 
     override fun onChildDraw(

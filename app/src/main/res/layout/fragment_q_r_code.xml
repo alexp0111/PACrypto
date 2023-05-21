@@ -14,7 +14,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/basic_margin"
         android:gravity="center"
-        android:text="Наведите камеру на QR-код с иконкой необходимой криптовалюты для получения информации о ней"
+        android:text="@string/qr_fr_hint"
         app:layout_constraintBottom_toTopOf="@+id/fab_scan"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

@@ -45,15 +45,13 @@
                     android:fontFamily="@font/inter_regular"
                     android:marqueeRepeatLimit="marquee_forever"
                     android:scrollHorizontally="true"
-                    android:singleLine="true"
-                    android:text="BTC" />
+                    android:singleLine="true" />
 
                 <TextView
                     android:id="@+id/tv_name"
                     style="@style/TextAcc"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Bitcoin" />
+                    android:layout_height="wrap_content" />
 
             </LinearLayout>
 
@@ -71,7 +69,6 @@
                 android:maxLines="1"
                 android:scrollHorizontally="true"
                 android:singleLine="true"
-                android:text="285.4$"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -95,7 +92,6 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:text="+3.11%"
                 android:textColor="@color/background_main"
                 app:layout_constraintEnd_toStartOf="@id/tv_period"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -109,7 +105,7 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/basic_margin"
                 android:gravity="start"
-                android:text="за день"
+                android:text="@string/per_day"
                 android:textColor="@color/background_main"
                 app:layout_constraintBottom_toBottomOf="@+id/tv_percents"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -126,7 +122,6 @@
             android:layout_marginHorizontal="@dimen/basic_margin"
             android:layout_height="0dp"
             android:gravity="center"
-            android:text="2017-08-09\n14:31:37"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/cl_end"
             app:layout_constraintStart_toStartOf="parent"

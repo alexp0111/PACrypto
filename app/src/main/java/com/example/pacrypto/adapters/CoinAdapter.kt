@@ -1,5 +1,6 @@
 package com.example.pacrypto.adapters
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
@@ -9,14 +10,21 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.pacrypto.R
 import com.example.pacrypto.data.SearchItem
 import com.example.pacrypto.databinding.ItemCoinType1Binding
+import com.example.pacrypto.util.Errors
+import com.example.pacrypto.util.Rates
 
+/**
+ * RecyclerView adapter, that shows info in form of SearchItem
+ *
+ * Provides function for open full info fragment about chosen item
+ * */
 class CoinAdapter(
     val context: Context,
     val onItemClicked: (Int, SearchItem) -> Unit
 ) : RecyclerView.Adapter<CoinAdapter.MyViewHolder>() {
 
     private var searchItemList: ArrayList<SearchItem> = arrayListOf()
-    private var rateMarker: String = "$"
+    private var rateMarker: String = Rates.USD_MARKER
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -37,14 +45,17 @@ class CoinAdapter(
         notifyItemRemoved(i)
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     fun updateList(searchItemList: ArrayList<SearchItem>) {
         val tmpList =
-            if (rateMarker == "$") searchItemList.sortedWith(compareBy(nullsFirst()) { it.rateCurrentUSD }).reversed()
-            else searchItemList.sortedWith(compareBy(nullsLast()) { it.rateCurrentRUB })
+            if (rateMarker == Rates.USD_MARKER) searchItemList.sortedWith(compareBy(nullsFirst()) { it.rateCurrentUSD })
+                .reversed()
+            else searchItemList.sortedWith(compareBy(nullsFirst()) { it.rateCurrentRUB }).reversed()
         this.searchItemList = ArrayList(tmpList)
         notifyDataSetChanged()
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     fun setRateMarker(rateMarker: String) {
         this.rateMarker = rateMarker
         notifyDataSetChanged()
@@ -57,40 +68,69 @@ class CoinAdapter(
     inner class MyViewHolder(private val binding: ItemCoinType1Binding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(item: SearchItem) {
-            binding.tvName.text = item.name
-            binding.tvTicker.text = item.ticker
-            binding.tvTicker.isSelected = true
-            if (item.rateCurrentUSD == null || item.rateCurrentRUB == null || item.timeUpdate == null || item.percents == null) {
-                binding.tvValue.text = "Нет данных"
-                binding.tvUpdateDate.text = "-"
-                binding.tvPercents.text = "-"
 
-                binding.clEnd.visibility = View.GONE
-            } else {
-                binding.clEnd.visibility = View.VISIBLE
-
-                if (rateMarker == "$"){
-                    binding.tvValue.text = buildString {
-                        append(String.format("%.2f", item.rateCurrentUSD))
-                        append(rateMarker)
-                    }
-                } else {
-                    binding.tvValue.text = buildString {
-                        append(String.format("%.2f", item.rateCurrentRUB))
-                        append(rateMarker)
-                    }
-                }
-                binding.tvUpdateDate.text = item.timeUpdate
-                if (item.percents!!.startsWith("+")) {
-                    binding.clEnd.background =
-                        ContextCompat.getDrawable(context, R.color.green_300)
-                } else {
-                    binding.clEnd.background =
-                        ContextCompat.getDrawable(context, R.color.orange_300)
-                }
-                binding.tvPercents.text = item.percents
+            // Basic info
+            binding.apply {
+                tvName.text = item.name
+                tvTicker.text = item.ticker
+                tvTicker.isSelected = true
             }
+
+            // Rate value
+            binding.apply {
+                if (rateMarker == Rates.USD_MARKER) {
+                    if (item.rateCurrentUSD == null) {
+                        tvValue.text = Errors(context).NO_DATA
+                    } else {
+                        tvValue.text = buildString {
+                            append(String.format("%.2f", item.rateCurrentUSD))
+                            append(rateMarker)
+                        }
+                    }
+                } else {
+                    if (item.rateCurrentRUB == null) {
+                        tvValue.text = Errors(context).NO_DATA
+                    } else {
+                        tvValue.text = buildString {
+                            append(String.format("%.2f", item.rateCurrentRUB))
+                            append(rateMarker)
+                        }
+                    }
+                }
+            }
+
+            // Delta info & time
+            binding.apply {
+                if (item.timeUpdate == null || item.percents == null) {
+                    tvUpdateDate.text = "-"
+                    tvPercents.text = "-"
+                    clEnd.visibility = View.GONE
+                } else {
+                    // time
+                    tvUpdateDate.text = item.timeUpdate
+
+                    // Percents color
+                    if (item.percents!!.startsWith("+")) {
+                        clEnd.background =
+                            ContextCompat.getDrawable(context, R.color.green_300)
+                    } else {
+                        clEnd.background =
+                            ContextCompat.getDrawable(context, R.color.orange_300)
+                    }
+
+                    // Percents value
+                    if (item.percents!!.length < 9) tvPercents.text = item.percents
+                    else tvPercents.text = "∞"
+
+                    // Layout visibility
+                    clEnd.visibility = View.VISIBLE
+                }
+            }
+
+            // For spinning if value.length > view width
             binding.tvValue.isSelected = true
+
+            // Whole card click listener
             binding.card.setOnClickListener { onItemClicked.invoke(absoluteAdapterPosition, item) }
         }
     }

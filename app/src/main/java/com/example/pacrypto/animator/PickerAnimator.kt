@@ -9,6 +9,9 @@ import androidx.core.animation.doOnEnd
 import androidx.core.animation.doOnStart
 import com.example.pacrypto.R
 
+/**
+ * Class that is responsible for animating pickers such as date picker & rate picker
+ * */
 class PickerAnimator(private val index: (String) -> Unit) {
 
     fun animate(
@@ -52,9 +55,4 @@ class PickerAnimator(private val index: (String) -> Unit) {
         }
         anim.start()
     }
-
-    companion object {
-        var currentIndex: String = ""
-    }
-
 }

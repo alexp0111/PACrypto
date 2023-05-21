@@ -1,4 +1,50 @@
 <resources>
-    <string name="app_name">PACrypto</string>
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="app_name" translatable="false">PACrypto</string>
+    <string name="hello_blank_fragment" translatable="false">Hello blank fragment</string>
+    <string name="removed_from_bookmarks">Removed from bookmarks</string>
+    <string name="restore">Restore</string>
+    <string name="course_alert">Course Alert</string>
+    <string name="price_is">\" price is: \"</string>
+    <string name="connection_error" translatable="false">Connection error</string>
+    <string name="failed_to_load_data">Failed to load data</string>
+    <string name="data_could_not_be_updated">Data could not be updated</string>
+    <string name="unable_to_add_subscription">Unable to add subscription</string>
+    <string name="unable_to_unsubscribe">Unable to unsubscribe</string>
+    <string name="unable_to_add_to_favorites">Unable to add to favorites</string>
+    <string name="unable_to_remove_from_favorites">Unable to remove from favorites</string>
+    <string name="аailed_to_search">Failed to search</string>
+    <string name="no_data">No data</string>
+    <string name="day">24h</string>
+    <string name="week">7d</string>
+    <string name="month">1m</string>
+    <string name="quorter">3m</string>
+    <string name="year">1y</string>
+    <string name="all">All</string>
+    <string name="not_correct_qr">It seems that the given QR code is not correct</string>
+    <string name="unrecognizable_qr">The code cannot be recognized by this application</string>
+    <string name="search">Search…</string>
+    <string name="updating">Updating the data</string>
+    <string name="bookmarks">Bookmarks</string>
+    <string name="on_request">On request</string>
+    <string name="na_nme">NA\nME</string>
+    <string name="tic_nker">TIC\nKER</string>
+    <string name="information">Information</string>
+    <string name="qr_fr_hint">Point the camera at the QR code with the icon of the required cryptocurrency to get information about it</string>
+    <string name="subscriptions">Notifications</string>
+    <string name="per_day">per day</string>
+    <string name="MO">MO</string>
+    <string name="TU">TU</string>
+    <string name="WE">WE</string>
+    <string name="TH">TH</string>
+    <string name="FR">FR</string>
+    <string name="SA">SA</string>
+    <string name="SU">SU</string>
+    <string-array name="ohlcvs_info">
+        <item>"Start price"</item>
+        <item>"Highest price"</item>
+        <item>"Lowest price"</item>
+        <item>"Close price"</item>
+        <item>"Total volume\ntraded"</item>
+        <item>"Total price count"</item>
+    </string-array>
 </resources>

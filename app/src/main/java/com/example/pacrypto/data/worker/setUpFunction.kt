@@ -7,8 +7,23 @@ import java.time.Duration
 import java.util.*
 import java.util.concurrent.TimeUnit
 
+/**
+ * This function is used for calculating the time of delay for worker
+ *  & actually setting up new worker
+ *
+ *  It also provides worker info about ticker & days of week, in which
+ *   it should be active
+ *
+ *  Important to note, that request builder have constraints such as
+ *
+ *          .setRequiredNetworkType(
+ *              NetworkType.CONNECTED
+ *          )
+ *
+ *  that helps worker to wait internet connection to come available
+ * */
 fun setUpSubscription(
-    settedCalendar: Calendar,
+    setCalendar: Calendar,
     item: SubItem,
     context: Context,
     weekDays: List<Int> = Sub.weekDays
@@ -18,7 +33,7 @@ fun setUpSubscription(
     val curTimeInMinutes =
         (calendar.get(Calendar.HOUR_OF_DAY) * 60 + calendar.get(Calendar.MINUTE)).toLong()
     val goalTimeInMinutes =
-        (settedCalendar.get(Calendar.HOUR_OF_DAY) * 60 + settedCalendar.get(Calendar.MINUTE)).toLong()
+        (setCalendar.get(Calendar.HOUR_OF_DAY) * 60 + setCalendar.get(Calendar.MINUTE)).toLong()
 
     val delay = if (curTimeInMinutes < goalTimeInMinutes) {
         Duration.ofMinutes(goalTimeInMinutes - curTimeInMinutes)

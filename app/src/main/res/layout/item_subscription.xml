@@ -40,8 +40,7 @@
                         style="@style/TextHeader"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:fontFamily="@font/inter_regular"
-                        android:text="BTC" />
+                        android:fontFamily="@font/inter_regular"/>
 
                 </LinearLayout>
 
@@ -67,8 +66,7 @@
                         android:fontFamily="@font/inter_regular"
                         android:gravity="center"
                         android:lines="1"
-                        android:maxLines="1"
-                        android:text="12:00" />
+                        android:maxLines="1" />
 
 
                 </LinearLayout>
@@ -113,7 +111,7 @@
                     android:layout_gravity="center_vertical"
                     android:background="@drawable/week_item_background"
                     android:gravity="center"
-                    android:text="ПН"
+                    android:text="@string/MO"
                     android:textColor="@color/color_on"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@id/tv_week_2"
@@ -128,7 +126,7 @@
                     android:layout_gravity="center_vertical"
                     android:background="@drawable/week_item_background"
                     android:gravity="center"
-                    android:text="ВТ"
+                    android:text="@string/TU"
                     android:textColor="@color/color_on"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@id/tv_week_3"
@@ -143,7 +141,7 @@
                     android:layout_gravity="center_vertical"
                     android:background="@drawable/week_item_background"
                     android:gravity="center"
-                    android:text="СР"
+                    android:text="@string/WE"
                     android:textColor="@color/color_on"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@id/tv_week_4"
@@ -158,7 +156,7 @@
                     android:layout_gravity="center_vertical"
                     android:background="@drawable/week_item_background"
                     android:gravity="center"
-                    android:text="ЧТ"
+                    android:text="@string/TH"
                     android:textColor="@color/color_on"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@id/tv_week_5"
@@ -173,7 +171,7 @@
                     android:layout_gravity="center_vertical"
                     android:background="@drawable/week_item_background"
                     android:gravity="center"
-                    android:text="ПТ"
+                    android:text="@string/FR"
                     android:textColor="@color/color_on"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@id/tv_week_6"
@@ -188,7 +186,7 @@
                     android:layout_gravity="center_vertical"
                     android:background="@drawable/week_item_background"
                     android:gravity="center"
-                    android:text="СБ"
+                    android:text="@string/SA"
                     android:textColor="@color/color_on"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@id/tv_week_7"
@@ -203,7 +201,7 @@
                     android:layout_gravity="center_vertical"
                     android:background="@drawable/week_item_background"
                     android:gravity="center"
-                    android:text="ВС"
+                    android:text="@string/SU"
                     android:textColor="@color/color_on"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"

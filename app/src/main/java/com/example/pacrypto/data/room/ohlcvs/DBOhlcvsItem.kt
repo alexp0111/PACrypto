@@ -1,5 +1,8 @@
 package com.example.pacrypto.data.room.ohlcvs
 
+/**
+ * Represenation of ohlcv in DB
+ * */
 data class DBOhlcvsItem(
     val price_close: Double,
     val price_high: Double,
