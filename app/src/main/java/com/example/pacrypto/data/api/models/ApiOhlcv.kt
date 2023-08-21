@@ -1,4 +1,4 @@
-package com.example.pacrypto.data.api_data
+package com.example.pacrypto.data.api.models
 
 /**
  * Contains historical info in OHLCV format (Open, High, Low, Close, Volume)

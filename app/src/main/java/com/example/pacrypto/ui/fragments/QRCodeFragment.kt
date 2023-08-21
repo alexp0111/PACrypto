@@ -1,4 +1,4 @@
-package com.example.pacrypto.ui
+package com.example.pacrypto.ui.fragments
 
 import android.app.Activity
 import android.content.Intent

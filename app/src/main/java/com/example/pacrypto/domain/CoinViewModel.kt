@@ -1,8 +1,8 @@
-package com.example.pacrypto.viewmodel
+package com.example.pacrypto.domain
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.pacrypto.data.CoinRepository
+import com.example.pacrypto.data.api.CoinRepository
 import com.example.pacrypto.util.DatePattern
 import com.example.pacrypto.util.SearchType
 import dagger.hilt.android.lifecycle.HiltViewModel

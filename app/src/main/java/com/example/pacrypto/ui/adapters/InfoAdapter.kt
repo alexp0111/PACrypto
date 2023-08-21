@@ -1,4 +1,4 @@
-package com.example.pacrypto.adapters
+package com.example.pacrypto.ui.adapters
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -24,7 +24,7 @@ class InfoAdapter(
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
-    ): InfoAdapter.MyViewHolder {
+    ): MyViewHolder {
         val itemView =
             ItemInfoBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return MyViewHolder(itemView)

@@ -1,4 +1,4 @@
-package com.example.pacrypto.adapters
+package com.example.pacrypto.ui.adapters
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.pacrypto.R
-import com.example.pacrypto.data.SearchItem
+import com.example.pacrypto.data.models.SearchItem
 import com.example.pacrypto.databinding.ItemCoinType1Binding
 import com.example.pacrypto.util.Errors
 import com.example.pacrypto.util.Rates
@@ -29,7 +29,7 @@ class CoinAdapter(
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
-    ): CoinAdapter.MyViewHolder {
+    ): MyViewHolder {
         val itemView =
             ItemCoinType1Binding.inflate(LayoutInflater.from(parent.context), parent, false)
         return MyViewHolder(itemView)

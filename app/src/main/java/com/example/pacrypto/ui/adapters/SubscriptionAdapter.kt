@@ -1,4 +1,4 @@
-package com.example.pacrypto.adapters
+package com.example.pacrypto.ui.adapters
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -29,7 +29,7 @@ class SubscriptionAdapter(
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
-    ): SubscriptionAdapter.MyViewHolder {
+    ): MyViewHolder {
         val itemView =
             ItemSubscriptionBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return MyViewHolder(itemView)

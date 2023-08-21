@@ -1,7 +1,7 @@
 package com.example.pacrypto.util
 
 import android.content.Context
-import com.example.pacrypto.data.api_data.ApiOhlcv
+import com.example.pacrypto.data.api.models.ApiOhlcv
 import com.example.pacrypto.data.room.ohlcvs.DBOhlcvs
 import com.example.pacrypto.data.room.ohlcvs.DBOhlcvsItem
 import java.util.*

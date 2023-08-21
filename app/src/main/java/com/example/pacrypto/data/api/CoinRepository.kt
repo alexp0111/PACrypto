@@ -1,7 +1,8 @@
-package com.example.pacrypto.data
+package com.example.pacrypto.data.api
 
 import androidx.room.withTransaction
-import com.example.pacrypto.api.CoinApi
+import com.example.pacrypto.data.models.SearchItem
+import com.example.pacrypto.data.models.SearchItemConverter
 import com.example.pacrypto.data.room.ohlcvs.OhlcvsDatabase
 import com.example.pacrypto.data.room.search_items.SearchItemDatabase
 import com.example.pacrypto.util.*

@@ -1,4 +1,4 @@
-package com.example.pacrypto.ui
+package com.example.pacrypto.ui.fragments
 
 import android.os.Bundle
 import android.view.View
@@ -15,13 +15,13 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.pacrypto.R
-import com.example.pacrypto.adapters.CoinAdapter
-import com.example.pacrypto.animator.PickerAnimator
-import com.example.pacrypto.animator.SwipeGesture
-import com.example.pacrypto.data.SearchItem
+import com.example.pacrypto.ui.adapters.CoinAdapter
+import com.example.pacrypto.ui.animators.PickerAnimator
+import com.example.pacrypto.ui.animators.SwipeGesture
+import com.example.pacrypto.data.models.SearchItem
 import com.example.pacrypto.databinding.FragmentHomeBinding
 import com.example.pacrypto.util.*
-import com.example.pacrypto.viewmodel.CoinViewModel
+import com.example.pacrypto.domain.CoinViewModel
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*

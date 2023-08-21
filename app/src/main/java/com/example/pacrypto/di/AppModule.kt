@@ -2,7 +2,7 @@ package com.example.pacrypto.di
 
 import android.app.Application
 import androidx.room.Room
-import com.example.pacrypto.api.CoinApi
+import com.example.pacrypto.data.api.CoinApi
 import com.example.pacrypto.data.room.ohlcvs.OhlcvsDatabase
 import com.example.pacrypto.data.room.search_items.SearchItemDatabase
 import com.example.pacrypto.util.DatabaseNames

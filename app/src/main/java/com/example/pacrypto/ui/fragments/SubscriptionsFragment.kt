@@ -1,4 +1,4 @@
-package com.example.pacrypto.ui
+package com.example.pacrypto.ui.fragments
 
 import android.app.TimePickerDialog
 import android.os.Bundle
@@ -8,7 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.work.WorkManager
 import com.example.pacrypto.R
-import com.example.pacrypto.adapters.SubscriptionAdapter
+import com.example.pacrypto.ui.adapters.SubscriptionAdapter
 import com.example.pacrypto.data.worker.SubItem
 import com.example.pacrypto.data.worker.setUpSubscription
 import com.example.pacrypto.databinding.FragmentSubscriptionsBinding

@@ -1,4 +1,4 @@
-package com.example.pacrypto.data.api_data
+package com.example.pacrypto.data.api.models
 
 /**
  * Contains info about asset, that API provides

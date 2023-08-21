@@ -1,8 +1,8 @@
-package com.example.pacrypto.api
+package com.example.pacrypto.data.api
 
-import com.example.pacrypto.data.api_data.ApiAsset
-import com.example.pacrypto.data.api_data.ApiListRates
-import com.example.pacrypto.data.api_data.ApiOhlcv
+import com.example.pacrypto.data.api.models.ApiAsset
+import com.example.pacrypto.data.api.models.ApiListRates
+import com.example.pacrypto.data.api.models.ApiOhlcv
 import retrofit2.http.GET
 import retrofit2.http.Headers
 import retrofit2.http.Path

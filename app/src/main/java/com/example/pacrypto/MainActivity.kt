@@ -3,8 +3,8 @@ package com.example.pacrypto
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.example.pacrypto.databinding.ActivityMainBinding
-import com.example.pacrypto.ui.HomeFragment
-import com.example.pacrypto.ui.InfoFragment
+import com.example.pacrypto.ui.fragments.HomeFragment
+import com.example.pacrypto.ui.fragments.InfoFragment
 import dagger.hilt.android.AndroidEntryPoint
 
 /**

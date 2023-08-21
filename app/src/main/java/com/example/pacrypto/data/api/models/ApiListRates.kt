@@ -1,6 +1,6 @@
-package com.example.pacrypto.data.api_data
+package com.example.pacrypto.data.api.models
 
-import com.example.pacrypto.data.Rate
+import com.example.pacrypto.data.models.Rate
 
 /**
  * Contains list of rates of all coins connected to id base (RUB or USD)

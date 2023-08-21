@@ -1,7 +1,7 @@
-package com.example.pacrypto.data
+package com.example.pacrypto.data.models
 
-import com.example.pacrypto.data.api_data.ApiAsset
-import com.example.pacrypto.data.api_data.ApiListRates
+import com.example.pacrypto.data.api.models.ApiAsset
+import com.example.pacrypto.data.api.models.ApiListRates
 import kotlin.math.abs
 
 

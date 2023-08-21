@@ -1,4 +1,4 @@
-package com.example.pacrypto.animator
+package com.example.pacrypto.ui.animators
 
 import android.content.Context
 import android.graphics.Canvas

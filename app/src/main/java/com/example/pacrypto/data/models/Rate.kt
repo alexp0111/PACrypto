@@ -1,4 +1,4 @@
-package com.example.pacrypto.data
+package com.example.pacrypto.data.models
 
 /**
  * Contains info about rate of coin at time

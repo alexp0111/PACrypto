@@ -1,4 +1,4 @@
-package com.example.pacrypto.ui
+package com.example.pacrypto.ui.fragments
 
 import android.app.TimePickerDialog
 import android.graphics.Color
@@ -17,14 +17,14 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.work.*
 import com.db.williamchart.ExperimentalFeature
 import com.example.pacrypto.R
-import com.example.pacrypto.adapters.InfoAdapter
-import com.example.pacrypto.animator.PickerAnimator
+import com.example.pacrypto.ui.adapters.InfoAdapter
+import com.example.pacrypto.ui.animators.PickerAnimator
 import com.example.pacrypto.data.room.ohlcvs.DBOhlcvsItem
 import com.example.pacrypto.data.worker.SubItem
 import com.example.pacrypto.data.worker.setUpSubscription
 import com.example.pacrypto.databinding.FragmentInfoBinding
 import com.example.pacrypto.util.*
-import com.example.pacrypto.viewmodel.OhlcvsViewModel
+import com.example.pacrypto.domain.OhlcvsViewModel
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
