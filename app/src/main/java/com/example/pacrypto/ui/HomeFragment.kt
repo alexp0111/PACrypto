@@ -3,7 +3,6 @@ package com.example.pacrypto.ui
 import android.os.Bundle
 import android.view.View
 import android.widget.TextView
-import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
@@ -245,10 +244,11 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                         coinAdapter.updateList(searchItemList)
                     }
                     if (it is UiState.Failure) {
-                        Toast.makeText(
+                        Snackbar.make(
                             requireContext(),
-                            Errors(requireContext()).IMPOSSIBLE_TO_SEARCH,
-                            Toast.LENGTH_SHORT
+                            requireView(),
+                            Errors(requireContext()).IMPOSSIBLE_TO_SEARCH ?: "",
+                            Snackbar.LENGTH_SHORT
                         ).show()
                     }
                 }
@@ -283,10 +283,11 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                         coinAdapter.updateList(searchItemList)
                     }
                     if (it is UiState.Failure) {
-                        Toast.makeText(
+                        Snackbar.make(
                             requireContext(),
-                            Errors(requireContext()).IMPOSSIBLE_TO_SEARCH,
-                            Toast.LENGTH_SHORT
+                            requireView(),
+                            Errors(requireContext()).IMPOSSIBLE_TO_SEARCH ?: "",
+                            Snackbar.LENGTH_SHORT
                         ).show()
                     }
                 }
@@ -320,10 +321,11 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         binding.etSearch.isEnabled = true
         binding.pb.visibility = View.GONE
 
-        Toast.makeText(
+        Snackbar.make(
             requireContext(),
-            Errors(requireContext()).IMPOSSIBLE_TO_UPDATE,
-            Toast.LENGTH_SHORT
+            requireView(),
+            Errors(requireContext()).IMPOSSIBLE_TO_UPDATE ?: "",
+            Snackbar.LENGTH_SHORT
         ).show()
     }
 

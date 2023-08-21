@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.view.View
 import android.widget.TextView
 import android.widget.TimePicker
-import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -26,6 +25,7 @@ import com.example.pacrypto.data.worker.setUpSubscription
 import com.example.pacrypto.databinding.FragmentInfoBinding
 import com.example.pacrypto.util.*
 import com.example.pacrypto.viewmodel.OhlcvsViewModel
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -169,7 +169,12 @@ class InfoFragment : Fragment(R.layout.fragment_info), TimePickerDialog.OnTimeSe
                 addFavItemToSP(requireActivity(), ticker)
                 setFavouriteVisibility(true, binding)
             } catch (e: java.lang.Exception) {
-                Toast.makeText(requireContext(), Errors(requireContext()).IMPOSSIBLE_TO_FAVOURITE, Toast.LENGTH_SHORT).show()
+                Snackbar.make(
+                    requireContext(),
+                    requireView(),
+                    Errors(requireContext()).IMPOSSIBLE_TO_FAVOURITE ?: "",
+                    Snackbar.LENGTH_SHORT
+                ).show()
             }
         }
 
@@ -180,7 +185,12 @@ class InfoFragment : Fragment(R.layout.fragment_info), TimePickerDialog.OnTimeSe
                 removeFavItemFromSP(requireActivity(), ticker)
                 setFavouriteVisibility(false, binding)
             } catch (e: java.lang.Exception) {
-                Toast.makeText(requireContext(), Errors(requireContext()).IMPOSSIBLE_TO_UNFAVOURITE, Toast.LENGTH_SHORT).show()
+                Snackbar.make(
+                    requireContext(),
+                    requireView(),
+                    Errors(requireContext()).IMPOSSIBLE_TO_UNFAVOURITE ?: "",
+                    Snackbar.LENGTH_SHORT
+                ).show()
             }
         }
 
@@ -197,7 +207,12 @@ class InfoFragment : Fragment(R.layout.fragment_info), TimePickerDialog.OnTimeSe
 
                 setSubVisibility(true, binding)
             } catch (e: java.lang.Exception) {
-                Toast.makeText(requireContext(),  Errors(requireContext()).IMPOSSIBLE_TO_SUBSCRIBE, Toast.LENGTH_SHORT).show()
+                Snackbar.make(
+                    requireContext(),
+                    requireView(),
+                    Errors(requireContext()).IMPOSSIBLE_TO_SUBSCRIBE ?: "",
+                    Snackbar.LENGTH_SHORT
+                ).show()
             }
         }
 
@@ -209,7 +224,12 @@ class InfoFragment : Fragment(R.layout.fragment_info), TimePickerDialog.OnTimeSe
                 workManager.cancelWorkById(uuid)
                 setSubVisibility(false, binding)
             } catch (e: java.lang.Exception) {
-                Toast.makeText(requireContext(), Errors(requireContext()).IMPOSSIBLE_TO_UNSUBSCRIBE, Toast.LENGTH_SHORT).show()
+                Snackbar.make(
+                    requireContext(),
+                    requireView(),
+                    Errors(requireContext()).IMPOSSIBLE_TO_UNSUBSCRIBE ?: "",
+                    Snackbar.LENGTH_SHORT
+                ).show()
             }
         }
     }
@@ -268,10 +288,11 @@ class InfoFragment : Fragment(R.layout.fragment_info), TimePickerDialog.OnTimeSe
                                 currency = if (it.data.type.endsWith(Rates.USD)) Rates.USD_MARKER else Rates.RUB_MARKER
                                 adapter.updateList(infoList!![0].asDoubleList(), currency)
                             }
-                            Toast.makeText(
+                            Snackbar.make(
                                 requireContext(),
-                                Errors(requireContext()).IMPOSSIBLE_TO_DOWNLOAD,
-                                Toast.LENGTH_SHORT
+                                requireView(),
+                                Errors(requireContext()).IMPOSSIBLE_TO_DOWNLOAD ?: "",
+                                Snackbar.LENGTH_SHORT
                             ).show()
                             binding.pb.visibility = View.GONE
                         }

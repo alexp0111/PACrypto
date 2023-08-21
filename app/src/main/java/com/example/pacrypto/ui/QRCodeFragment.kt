@@ -4,12 +4,12 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import com.example.pacrypto.R
 import com.example.pacrypto.databinding.FragmentQRCodeBinding
 import com.example.pacrypto.util.QRInfo
+import com.google.android.material.snackbar.Snackbar
 import com.google.zxing.integration.android.IntentIntegrator
 
 /**
@@ -58,17 +58,19 @@ class QRCodeFragment : Fragment(R.layout.fragment_q_r_code) {
                         parentFragmentManager.beginTransaction().addToBackStack(null)
                             .replace(R.id.container_main, fragment).commit()
                     } else {
-                        Toast.makeText(
+                        Snackbar.make(
                             requireContext(),
-                            QRInfo(requireContext()).IMPOSSIBLE_TO_READ_ERROR,
-                            Toast.LENGTH_SHORT
+                            requireView(),
+                            QRInfo(requireContext()).IMPOSSIBLE_TO_READ_ERROR ?: "",
+                            Snackbar.LENGTH_SHORT
                         ).show()
                     }
                 } else {
-                    Toast.makeText(
+                    Snackbar.make(
                         requireContext(),
-                        QRInfo(requireContext()).NOT_MATCHES_ERROR,
-                        Toast.LENGTH_SHORT
+                        requireView(),
+                        QRInfo(requireContext()).NOT_MATCHES_ERROR ?: "",
+                        Snackbar.LENGTH_SHORT
                     ).show()
                 }
             }
