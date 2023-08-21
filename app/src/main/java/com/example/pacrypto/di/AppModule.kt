@@ -2,6 +2,7 @@ package com.example.pacrypto.di
 
 import android.app.Application
 import androidx.room.Room
+import com.example.pacrypto.BuildConfig
 import com.example.pacrypto.data.api.CoinApi
 import com.example.pacrypto.data.room.ohlcvs.OhlcvsDatabase
 import com.example.pacrypto.data.room.search_items.SearchItemDatabase
@@ -10,6 +11,8 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import okhttp3.OkHttpClient
+import okhttp3.Request
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.Calendar
@@ -22,6 +25,12 @@ object AppModule {
     @Singleton
     fun provideRetrofit(): Retrofit =
         Retrofit.Builder()
+            .client(OkHttpClient.Builder().addInterceptor { chain ->
+                val newRequest: Request = chain.request().newBuilder()
+                    .addHeader("X-CoinAPI-Key", BuildConfig.API_KEY)
+                    .build()
+                chain.proceed(newRequest)
+            }.build())
             .baseUrl(CoinApi.BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
