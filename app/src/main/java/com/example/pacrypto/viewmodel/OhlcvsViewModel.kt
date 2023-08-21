@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.pacrypto.data.CoinRepository
 import com.example.pacrypto.util.OhlcvsInfo
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.SharingStarted
@@ -12,6 +13,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.plus
 import javax.inject.Inject
 
 /**
@@ -35,11 +37,11 @@ class OhlcvsViewModel @Inject constructor(
 
     val ohlcvs = refreshTrigger.flatMapLatest { pair ->
         repository.getOhlcv(pair.first, pair.second)
-    }.stateIn(viewModelScope, SharingStarted.Lazily, null)
+    }.stateIn(viewModelScope.plus(Dispatchers.IO), SharingStarted.Lazily, null)
 
 
     fun getExactOhlcvs(ticker: String, currency: String) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             refreshTriggerChannel.send(
                 Pair(
                     OhlcvsInfo.REQUEST_PREFIX + ticker + OhlcvsInfo.REQUEST_DIVIDER + currency,
@@ -50,7 +52,7 @@ class OhlcvsViewModel @Inject constructor(
     }
 
     fun getExactOhlcvs(ticker: String, currency: String, shouldFetch: Boolean) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             refreshTriggerChannel.send(
                 Pair(
                     OhlcvsInfo.REQUEST_PREFIX + ticker + OhlcvsInfo.REQUEST_DIVIDER + currency,

@@ -6,6 +6,7 @@ import com.example.pacrypto.data.CoinRepository
 import com.example.pacrypto.util.DatePattern
 import com.example.pacrypto.util.SearchType
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.SharingStarted
@@ -13,6 +14,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.plus
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
@@ -47,21 +49,21 @@ class CoinViewModel @Inject constructor(
 
     val searchItems = refreshTriggerForSearchItems.flatMapLatest { pair ->
         repository.getSearchItems(pair.first, pair.second)
-    }.stateIn(viewModelScope, SharingStarted.Lazily, null)
+    }.stateIn(viewModelScope.plus(Dispatchers.IO), SharingStarted.Lazily, null)
 
     val exactSearchItem = refreshTriggerForExactSearchItem.flatMapLatest { pair ->
         repository.getExactSearchItem(pair)
-    }.stateIn(viewModelScope, SharingStarted.Lazily, null)
+    }.stateIn(viewModelScope.plus(Dispatchers.IO), SharingStarted.Lazily, null)
 
     val favs = refreshTriggerForFavs.flatMapLatest { list ->
         repository.getFavs(list)
-    }.stateIn(viewModelScope, SharingStarted.Lazily, null)
+    }.stateIn(viewModelScope.plus(Dispatchers.IO), SharingStarted.Lazily, null)
 
     //
 
 
     fun refreshAllData() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             val sdf = SimpleDateFormat(DatePattern.FULL_INFO, Locale.getDefault())
             val c = Calendar.getInstance()
             val timeActual = c.time
@@ -77,13 +79,13 @@ class CoinViewModel @Inject constructor(
     }
 
     fun getExactSearchItem(input: String, type: SearchType) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             refreshTriggerChannelForExactSearchItem.send(Pair(input, type))
         }
     }
 
     fun getFavouriteList(allItemsInSP: List<String>) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             refreshTriggerChannelForFavs.send(allItemsInSP)
         }
     }
