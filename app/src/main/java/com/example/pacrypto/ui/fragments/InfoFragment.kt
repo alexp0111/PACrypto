@@ -13,6 +13,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.work.*
 import com.db.williamchart.ExperimentalFeature
@@ -140,7 +141,7 @@ class InfoFragment : Fragment(R.layout.fragment_info), TimePickerDialog.OnTimeSe
         // Back button
         binding.apply {
             ivBack.setOnClickListener {
-                parentFragmentManager.popBackStack()
+                findNavController().popBackStack()
             }
         }
 

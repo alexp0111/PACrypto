@@ -11,6 +11,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -53,8 +54,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                 bundle.putString("name", item.name)
                 fragment.arguments = bundle
 
-                parentFragmentManager.beginTransaction().addToBackStack(null)
-                    .replace(R.id.container_main, fragment).commit()
+                findNavController().navigate(R.id.action_homeFragment_to_infoFragment, bundle)
             }
         )
     }
@@ -123,17 +123,13 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
         // subscriptions button listener
         binding.ivSub.setOnClickListener {
-            parentFragmentManager.beginTransaction()
-                .replace(R.id.container_main, SubscriptionsFragment())
-                .addToBackStack(null).commit()
+            findNavController().navigate(R.id.action_homeFragment_to_subscriptionsFragment)
         }
 
 
         // qr code scanning
         binding.ivQr.setOnClickListener {
-            parentFragmentManager.beginTransaction()
-                .replace(R.id.container_main, QRCodeFragment())
-                .addToBackStack(null).commit()
+            findNavController().navigate(R.id.action_homeFragment_to_QRCodeFragment)
         }
 
 

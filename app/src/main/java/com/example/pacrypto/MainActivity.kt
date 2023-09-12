@@ -2,8 +2,8 @@ package com.example.pacrypto
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.navigation.fragment.NavHostFragment
 import com.example.pacrypto.databinding.ActivityMainBinding
-import com.example.pacrypto.ui.fragments.HomeFragment
 import com.example.pacrypto.ui.fragments.InfoFragment
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -23,6 +23,10 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+        val navController = navHostFragment.navController
+
         val uri = intent.data
 
         if (uri != null && uri.pathSegments.size == 2) {
@@ -33,12 +37,7 @@ class MainActivity : AppCompatActivity() {
             bundle.putString("name", params.last())
             fragment.arguments = bundle
 
-            supportFragmentManager.beginTransaction()
-                .replace(R.id.container_main, fragment).commit()
-        } else {
-            supportFragmentManager.beginTransaction()
-                .replace(R.id.container_main, HomeFragment()).commit()
+            navController.navigate(R.id.action_homeFragment_to_infoFragment, bundle)
         }
-
     }
 }

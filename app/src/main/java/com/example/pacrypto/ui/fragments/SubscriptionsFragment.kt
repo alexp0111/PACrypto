@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.TimePicker
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.work.WorkManager
 import com.example.pacrypto.R
@@ -83,7 +84,7 @@ class SubscriptionsFragment : Fragment(R.layout.fragment_subscriptions),
         fragmentSubscriptionsBinding = binding
 
         binding.ivBack.setOnClickListener {
-            parentFragmentManager.popBackStack()
+            findNavController().popBackStack()
         }
 
         val manager = LinearLayoutManager(context)

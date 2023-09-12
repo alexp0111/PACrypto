@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.example.pacrypto.R
 import com.example.pacrypto.databinding.FragmentQRCodeBinding
 import com.example.pacrypto.util.QRInfo
@@ -55,8 +56,7 @@ class QRCodeFragment : Fragment(R.layout.fragment_q_r_code) {
                         bundle.putString("name", text.substringAfterLast('/'))
                         fragment.arguments = bundle
 
-                        parentFragmentManager.beginTransaction().addToBackStack(null)
-                            .replace(R.id.container_main, fragment).commit()
+                        findNavController().navigate(R.id.action_QRCodeFragment_to_infoFragment, bundle)
                     } else {
                         Snackbar.make(
                             requireContext(),
